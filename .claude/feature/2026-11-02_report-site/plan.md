@@ -1,7 +1,8 @@
 # 보고서 사이트 (Next.js) — 기획서
 
 > 상태: **구현·로컬 검증 완료 (2026-11-02)**. `web/`. lint·tsc·vitest(2 files 22건) 통과, 실제 보고서 3건으로 프로덕션 빌드(18개 경로 전부 정적), 보고서 0건·깨진 샘플 빌드도 통과(§7).
-> 남은 것(사용자): 결과 검토, 커밋, Vercel 프로젝트 생성(Root Directory `web`, `SITE_URL`), 배포 후 확인(§7 미완 항목).
+> 배포: `https://daily-report-ashy-nine.vercel.app` (2026-11-02, Root Directory `web`).
+> 남은 것: 보고서 push 후 자동 재배포 확인(11-03 아침), 빌드 건너뛰기 확인, 검색엔진 등록(사용자). §7 미완 항목.
 >
 > 구현 변경점 (계획 대비):
 > - **`cacheComponents`·`partialPrefetching`을 껐다.** create-next-app 16.4 기본값이 켜져 있는데, 켜면 `dynamicParams`를 쓸 수 없고 `generateStaticParams`가 빈 배열이면 빌드가 실패한다(A1과 충돌). 전부 빌드 시점 정적이라 이점도 없다. `next.config.ts`에 이유를 적었다.
@@ -12,6 +13,7 @@
 > - **`@types/node`를 ^24로 올렸다.** create-next-app 기본 ^20이 vitest 5의 peer 범위와 맞지 않는다. 로컬 Node도 v24다.
 > - **파비콘을 `app/icon.tsx`로 만들고** 템플릿 이미지(public/*.svg, favicon.ico)는 지웠다.
 > - **`web/CLAUDE.md` 추가**: create-next-app이 만든 `AGENTS.md`(번들 문서를 먼저 읽으라는 규칙)를 Claude Code가 읽도록 `@AGENTS.md`로 불러온다.
+> - **빌드 건너뛰기 비교 기준을 `VERCEL_GIT_PREVIOUS_SHA`로 (2026-11-02, 태그 작업 커밋 때)**: `HEAD^`만 비교하면 커밋 여러 개를 한 번에 push할 때 마지막 커밋만 보고 판단한다. 마지막이 기획서 수정뿐이면 앞의 사이트 변경까지 배포되지 않는다. 마지막 성공 배포 시점과 비교하고, 값이 없거나 얕은 clone이라 비교할 수 없으면(git 오류 = 0이 아닌 종료 코드) 빌드한다.
 > - **오늘 보고서 3건에 SEO 필드(`headline`, `description`, `tags`)를 직접 채웠다(§6-7).** 보고서가 "미확인 보도"로 분류한 항목(DeepSeek 코딩 에이전트, Cursor용 확장 백도어)은 headline·tags에서 뺐다.
 
 ## 0. TL;DR
@@ -203,6 +205,8 @@ web/
 - [x] 본문 첫 줄 `[날짜 제목]`은 빠지고 기준 시각은 헤더에 표시 (D10). `<script>`는 실행되지 않고 글자로 남음 (C1)
 - [x] 화면: headless Chrome 스크린샷으로 홈·상세(1280px), 상세·홈(390px, iframe), OG 이미지 확인. 390px에서 가로 스크롤 없음 (C3). 모바일 메타 줄의 `·`만 줄 끝에 남던 문제 수정
 - [x] 라이트 모드 화면 확인 (`--blink-settings=preferredColorScheme=1`). 태그와 본문 첫 제목 사이 여백이 과해 본문 첫 요소의 위 여백을 0으로 수정
-- [ ] Vercel 배포, 보고서 push 후 자동 재배포
-- [ ] `scheduler/`만 바꾼 커밋에서 빌드를 건너뛰는지 확인
-- [ ] 배포 주소로 `SITE_URL` 지정 후 canonical·OG 절대 주소 확인 (S2)
+- [x] Vercel 배포 (2026-11-02, `https://daily-report-ashy-nine.vercel.app`): 17개 경로 200, 없는 경로 404, `x-vercel-cache: HIT`(정적). 글꼴·화면 로컬과 같음
+- [x] `SITE_URL` 없이 `VERCEL_PROJECT_PRODUCTION_URL`로 canonical·og:url·OG 이미지·JSON-LD·sitemap·robots·RSS 절대 주소가 운영 주소로 나옴 (S2)
+- [ ] 보고서 push 후 자동 재배포 (2026-11-03 08:38 루틴으로 확인 예정)
+- [ ] `scheduler/`만 바꾼 커밋에서 빌드를 건너뛰는지 확인 (다음 규칙 수정 때 Deployments에서 Ignored 확인)
+- [ ] Google Search Console·네이버 서치어드바이저 등록 (사용자): 소유 확인 값을 환경 변수로 넣고 sitemap·RSS 제출
