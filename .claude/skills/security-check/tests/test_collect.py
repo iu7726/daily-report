@@ -226,6 +226,86 @@ class Inventory(unittest.TestCase):
             self.assertEqual(data["repos"]["nolock"]["projects"][0]["packages"]["next"]["installed"], {})
 
 
+class Usage(unittest.TestCase):
+    """사용처 검색: 소스·설정만 보고, 의존성·산출물·lockfile·.env는 건너뛴다."""
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.root = Path(tmp.name).resolve()
+        app = self.root / "app"
+        files = {
+            "package.json": json.dumps({"name": "app"}),
+            "src/app/(shop)/cart/deep/page.tsx": "import Image from 'next/image'\n",
+            "lib/actions.ts": "// 서버 액션\n'use server'\nexport async function save() {}\n",
+            "components/Form.tsx": "export function Form() {\n  async function go() {\n    \"use server\"\n  }\n}\n",
+            "next.config.mjs": "export default { output: 'standalone' }\n",
+            "Dockerfile.prod": "FROM node:24-alpine\n",
+            ".github/workflows/ci.yml": "node-version: 24\n",
+            "README.md": "'use server' 설명\n",  # 확장자 밖
+            ".env.local": "SECRET='use server'\n",  # .env 제외
+            "package-lock.json": "{\"next/image\": 1}\n",  # lockfile 제외
+            "node_modules/next/dist/x.js": "'use server'\n",  # 의존성 제외
+            ".next/server/app.js": "'use server'\n",  # 빌드 산출물 제외
+            ".turbo/cache.json": "'use server'\n",  # 숨김 폴더 제외
+        }
+        for rel, text in files.items():
+            p = app / rel
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(text)
+        (self.root / "notnode").mkdir()
+        (self.root / "notnode" / "main.ts").write_text("'use server'\n")  # package.json 없는 폴더는 건너뜀
+
+    def run_usage(self, *patterns, max_files=3):
+        scope = collect.resolve_scope(root_arg=str(self.root))
+        return collect.usage(scope, collect.parse_patterns(list(patterns)), max_files)
+
+    def test_finds_only_source_and_config(self):
+        data = self.run_usage(
+            "use server=^\\s*['\"]use server['\"]",
+            "next/image=from ['\"]next/image['\"]",
+            "output=output:\\s*'(\\w+)'",
+            "alpine=FROM\\s+node:\\S*alpine",
+            "ci node=node-version",
+            "use cache=^\\s*['\"]use cache",
+        )
+        self.assertEqual(list(data["repos"]), ["app"])
+        m = data["repos"]["app"]["matches"]
+        self.assertEqual(m["use server"]["files"], 2)  # 파일 맨 위 + 함수 안(인라인)
+        lines = {e["path"]: e["line"] for e in m["use server"]["examples"]}
+        self.assertEqual(lines, {"lib/actions.ts": 2, "components/Form.tsx": 3})
+        self.assertEqual(m["next/image"]["examples"][0]["path"], "src/app/(shop)/cart/deep/page.tsx")  # 깊이 제한 없음
+        self.assertEqual(m["output"]["files"], 1)
+        self.assertEqual(m["alpine"]["examples"][0]["path"], "Dockerfile.prod")
+        self.assertEqual(m["ci node"]["examples"][0]["path"], ".github/workflows/ci.yml")
+        self.assertEqual(m["use cache"], {"files": 0, "examples": []})
+
+    def test_max_files_limits_examples_not_count(self):
+        data = self.run_usage("any=.", max_files=1)
+        r = data["repos"]["app"]["matches"]["any"]
+        self.assertEqual(len(r["examples"]), 1)
+        self.assertGreater(r["files"], 1)
+
+    def test_pattern_parsing(self):
+        pats = collect.parse_patterns(["next.config", "a=b=c"])
+        self.assertEqual(pats["next.config"].pattern, "next.config")  # '='가 없으면 정규식이 곧 이름
+        self.assertEqual(pats["a"].pattern, "b=c")  # 첫 '='에서만 나눔
+        with self.assertRaises(SystemExit):
+            collect.parse_patterns(["bad=("])
+        with self.assertRaises(SystemExit):
+            collect.parse_patterns(["=x"])
+
+    def test_cli_output(self):
+        out = io.StringIO()
+        with redirect_stdout(out):
+            code = collect.main(["usage", "--root", str(self.root), "--pattern", "use cache=use cache", "--pattern", "img=next/image"])
+        self.assertEqual(code, 0)
+        text = out.getvalue()
+        self.assertIn("- use cache: 없음", text)
+        self.assertIn("- img: 파일 1개", text)
+        self.assertIn("src/app/(shop)/cart/deep/page.tsx:1:", text)
+
+
 class Scope(unittest.TestCase):
     """점검 대상 설정: 자동(한 폴더 아래 전부) / 지정(폴더 목록), 우선순위."""
 

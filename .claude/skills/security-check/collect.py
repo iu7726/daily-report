@@ -4,6 +4,7 @@
 하위 명령
   reports   최근 IT 보안 리포트(이 저장소 origin 기본 브랜치)를 출력
   inventory 점검 루트 아래 프로젝트의 설치 버전·런타임 단서를 모으고 --check 규칙으로 판정
+  usage     프로젝트 소스·설정에서 정규식 패턴을 찾는다(취약 기능을 실제로 쓰는지, 노출 조건 확인용)
   audit     npm/pnpm audit 실행 결과(high·critical) 요약. 사용자가 동의한 경우에만 실행한다
   outpath   결과 파일 경로를 정하고, 이 저장소 안이면 거부
   config    점검 대상 설정(자동: 한 폴더 아래 전부 / 지정: 폴더 목록) 보기·저장
@@ -34,6 +35,10 @@ SKIP_DIRS = {
 }
 KST = datetime.timezone(datetime.timedelta(hours=9))
 INF = 10**9
+# usage 검색 대상: 소스·설정 파일만. lockfile은 패키지 이름이 잔뜩 들어 있어 "사용처"가 아니므로 뺀다.
+USAGE_EXTS = {".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs", ".json", ".yml", ".yaml", ".toml"}
+USAGE_SKIP_FILES = set(LOCKFILES) | {"bun.lockb"}
+USAGE_MAX_BYTES = 1_000_000
 
 
 # ── 공통 ────────────────────────────────────────────────────────────────
@@ -493,6 +498,96 @@ def print_inventory(data: dict) -> None:
     print(f"\n요약: 취약 {counts['vulnerable']}, 불명확 {counts['unclear']}, 설치 버전 불명 {counts['unknown_install']}")
 
 
+# ── 사용처 검색 ──────────────────────────────────────────────────────────
+
+def parse_patterns(items: list[str]) -> dict[str, re.Pattern]:
+    """'이름=정규식' 목록 → {이름: 컴파일된 정규식}. '='가 없으면 정규식 자체를 이름으로 쓴다."""
+    patterns: dict[str, re.Pattern] = {}
+    for item in items:
+        name, sep, regex = item.partition("=")
+        if not sep:
+            name, regex = item, item
+        name, regex = name.strip(), regex.strip()
+        if not name or not regex:
+            raise SystemExit(f"패턴 형식이 틀림: {item!r} (예: \"use server=^\\s*['\\\"]use server['\\\"]\")")
+        try:
+            patterns[name] = re.compile(regex)
+        except re.error as e:
+            raise SystemExit(f"정규식 오류 ({name}): {e}")
+    return patterns
+
+
+def iter_source_files(top: Path):
+    """프로젝트 폴더 아래 소스·설정 파일. 의존성·빌드 산출물·숨김 폴더(.github 제외)는 건너뛴다. 깊이 제한 없음."""
+    for dirpath, dirnames, filenames in os.walk(top):
+        dirnames[:] = sorted(d for d in dirnames if d not in SKIP_DIRS and (not d.startswith(".") or d == ".github"))
+        here = Path(dirpath)
+        for f in sorted(filenames):
+            lower = f.lower()
+            if f in USAGE_SKIP_FILES or lower.startswith(".env"):
+                continue
+            is_docker = lower.startswith("dockerfile") or lower.endswith(".dockerfile")
+            if not is_docker and Path(lower).suffix not in USAGE_EXTS:
+                continue
+            p = here / f
+            try:
+                if p.stat().st_size > USAGE_MAX_BYTES:
+                    continue
+            except OSError:
+                continue
+            yield p
+
+
+def search_usage(top: Path, patterns: dict[str, re.Pattern], max_files: int) -> dict[str, dict]:
+    """패턴마다 일치한 파일 수와, 앞 max_files개 파일의 첫 일치 줄."""
+    result = {name: {"files": 0, "examples": []} for name in patterns}
+    for p in iter_source_files(top):
+        try:
+            lines = p.read_text(encoding="utf-8", errors="ignore").splitlines()
+        except OSError:
+            continue
+        for name, rx in patterns.items():
+            for no, line in enumerate(lines, 1):
+                if rx.search(line):
+                    r = result[name]
+                    r["files"] += 1
+                    if len(r["examples"]) < max_files:
+                        r["examples"].append({"path": str(p.relative_to(top)), "line": no, "text": line.strip()[:120]})
+                    break
+    return result
+
+
+def usage(scope: dict, patterns: dict[str, re.Pattern], max_files: int) -> dict:
+    repos: dict[str, dict] = {}
+    for top in scope["tops"]:
+        if not find_projects(top, scope["max_depth"]):  # inventory와 같은 기준: Node 프로젝트가 있는 폴더만
+            continue
+        label = top.name if top.name not in repos else str(top)
+        repos[label] = {"path": str(top), "matches": search_usage(top, patterns, max_files)}
+    scope_out = {k: scope[k] for k in ("mode", "source", "root", "missing", "exclude")}
+    scope_out["description"] = describe_scope(scope)
+    return {"scope": scope_out, "patterns": {k: v.pattern for k, v in patterns.items()}, "repos": repos}
+
+
+def print_usage(data: dict) -> None:
+    print(f"점검 대상: {data['scope']['description']}  (Node 프로젝트가 있는 폴더 {len(data['repos'])}곳)")
+    for m in data["scope"]["missing"]:
+        print(f"  ⚠ 찾을 수 없는 경로: {m}")
+    print("패턴:")
+    for name, regex in data["patterns"].items():
+        print(f"  - {name}: {regex}")
+    for label, repo in data["repos"].items():
+        print(f"\n## {label}")
+        for name, r in repo["matches"].items():
+            if not r["files"]:
+                print(f"  - {name}: 없음")
+                continue
+            print(f"  - {name}: 파일 {r['files']}개")
+            for ex in r["examples"]:
+                print(f"      {ex['path']}:{ex['line']}: {ex['text']}")
+    print("\n참고: 소스·설정 파일(.ts/.js/.json/.yml/Dockerfile 등)만 찾았다. lockfile·node_modules·빌드 산출물·.env는 제외.")
+
+
 # ── 하위 명령 ────────────────────────────────────────────────────────────
 
 DATE_IN_PATH = re.compile(r"(\d{4})/(\d{2})/(\d{2})\.md$|(\d{4})-(\d{2})-(\d{2})\.md$")
@@ -570,6 +665,19 @@ def cmd_inventory(args) -> int:
         print(json.dumps(data, ensure_ascii=False, indent=1, default=sorted))
     else:
         print_inventory(data)
+    return 0
+
+
+def cmd_usage(args) -> int:
+    scope = resolve_scope(args.root, args.path)
+    if not scope["tops"]:
+        print(f"점검할 프로젝트 폴더가 없습니다. ({describe_scope(scope)})", file=sys.stderr)
+        return 2
+    data = usage(scope, parse_patterns(args.pattern), args.max_files)
+    if args.json:
+        print(json.dumps(data, ensure_ascii=False, indent=1))
+    else:
+        print_usage(data)
     return 0
 
 
@@ -718,6 +826,15 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--max-depth", type=int)
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=cmd_inventory)
+
+    p = sub.add_parser("usage", help="사용처 검색 (노출 조건 확인용)")
+    p.add_argument("--pattern", action="append", required=True, metavar="NAME=REGEX",
+                   help="예: \"use server=^\\s*['\\\"]use server['\\\"]\" (여러 번 가능, 줄 단위로 찾음)")
+    p.add_argument("--root", help="이번만 자동 모드로 이 폴더 아래를 점검")
+    p.add_argument("--path", action="append", help="이번만 이 프로젝트 폴더들을 점검 (여러 번 가능)")
+    p.add_argument("--max-files", type=int, default=3, help="패턴마다 보여 줄 파일 수 (기본 3)")
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(func=cmd_usage)
 
     p = sub.add_parser("audit", help="npm/pnpm audit (사용자 동의 후에만)")
     p.add_argument("--root", help="이번만 자동 모드로 이 폴더 아래를 점검")
