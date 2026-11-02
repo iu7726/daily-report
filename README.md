@@ -33,7 +33,7 @@
 
 ```mermaid
 flowchart LR
-    R["⏰ Claude 클라우드 루틴<br/>매일 아침 3회"] -->|웹 조사 · 1차 자료 확인| M["📝 reports/작업/날짜.md"]
+    R["⏰ Claude 클라우드 루틴<br/>매일 아침 3회"] -->|웹 조사 · 1차 자료 확인| M["📝 reports/작업/년/월/일.md"]
     M -->|git push| G[("GitHub")]
     G -->|자동 배포| V["▲ Vercel<br/>정적 사이트"]
     R -.->|요약 한 줄| P["📱 휴대폰 알림"]
@@ -69,7 +69,7 @@ flowchart LR
 ```
 daily-report/
 ├── scheduler/          # 루틴 프롬프트 (공통 규칙 + 작업 3개)
-├── reports/            # 루틴이 쓴 보고서 (작업별 · 날짜별 Markdown)
+├── reports/            # 루틴이 쓴 보고서 (작업/년/월/일.md)
 ├── web/                # Next.js 정적 사이트
 │   ├── app/            #   홈 · 날짜 · 작업 · 상세 · 태그 · sitemap · RSS · OG
 │   └── lib/            #   보고서 읽기·검증, 날짜, 태그 (vitest 단위 테스트)

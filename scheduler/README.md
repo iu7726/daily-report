@@ -13,7 +13,7 @@
 
 1. 정해진 시각에 Claude 루틴이 클라우드에서 이 저장소를 받아 실행한다.
 2. 루틴은 `scheduler/CLAUDE.md`와 해당 작업 파일을 읽고 웹을 조사해 보고서를 쓴다.
-3. 보고서를 `reports/<작업 ID>/YYYY-MM-DD.md`로 저장해 `main`에 push한다. 파일 앞의 frontmatter(`title`, `task`, `date`, `generated_at`, `level`, `summary`)는 사이트에서 목록과 캘린더를 만드는 데 쓴다. 필드 정의는 `CLAUDE.md`의 '결과 저장'에 있다.
+3. 보고서를 `reports/<작업 ID>/YYYY/MM/DD.md`로 저장해 `main`에 push한다. 파일 앞의 frontmatter(`title`, `task`, `date`, `generated_at`, `level`, `summary`)는 사이트에서 목록과 캘린더를 만드는 데 쓴다. 필드 정의는 `CLAUDE.md`의 '결과 저장'에 있다.
 
 프롬프트는 이 폴더의 파일을 고쳐 push하면 다음 실행부터 반영된다. 루틴 설정은 따로 바꿀 필요가 없다.
 
