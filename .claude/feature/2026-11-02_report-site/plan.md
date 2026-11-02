@@ -14,6 +14,7 @@
 > - **파비콘을 `app/icon.tsx`로 만들고** 템플릿 이미지(public/*.svg, favicon.ico)는 지웠다.
 > - **`web/CLAUDE.md` 추가**: create-next-app이 만든 `AGENTS.md`(번들 문서를 먼저 읽으라는 규칙)를 Claude Code가 읽도록 `@AGENTS.md`로 불러온다.
 > - **빌드 건너뛰기 비교 기준을 `VERCEL_GIT_PREVIOUS_SHA`로 (2026-11-02, 태그 작업 커밋 때)**: `HEAD^`만 비교하면 커밋 여러 개를 한 번에 push할 때 마지막 커밋만 보고 판단한다. 마지막이 기획서 수정뿐이면 앞의 사이트 변경까지 배포되지 않는다. 마지막 성공 배포 시점과 비교하고, 값이 없거나 얕은 clone이라 비교할 수 없으면(git 오류 = 0이 아닌 종료 코드) 빌드한다.
+> - **빌드 건너뛰기 검사를 스크립트로 (v0.0.3)**: 커밋 메시지를 다시 쓰려고 force push하자 `VERCEL_GIT_PREVIOUS_SHA`(e44edf6)가 사라져 `git diff`가 `bad object`(종료 코드 128)로 끝났고, Vercel이 배포를 오류 처리했다(운영 사이트는 직전 성공 배포 유지). `web/scripts/vercel-ignore.sh`로 옮겨 기준 커밋이 없거나 오류가 나면 빌드(1), 변경이 없을 때만 건너뜀(0)으로 끝나게 했다.
 > - **오늘 보고서 3건에 SEO 필드(`headline`, `description`, `tags`)를 직접 채웠다(§6-7).** 보고서가 "미확인 보도"로 분류한 항목(DeepSeek 코딩 에이전트, Cursor용 확장 백도어)은 headline·tags에서 뺐다.
 
 ## 0. TL;DR
@@ -208,5 +209,6 @@ web/
 - [x] Vercel 배포 (2026-11-02, `https://daily-report-ashy-nine.vercel.app`): 17개 경로 200, 없는 경로 404, `x-vercel-cache: HIT`(정적). 글꼴·화면 로컬과 같음
 - [x] `SITE_URL` 없이 `VERCEL_PROJECT_PRODUCTION_URL`로 canonical·og:url·OG 이미지·JSON-LD·sitemap·robots·RSS 절대 주소가 운영 주소로 나옴 (S2)
 - [x] 보고서 push 후 자동 재배포 (2026-11-02 루틴 재실행): 운영 사이트 제목이 재실행본 headline으로 바뀜
-- [ ] 문서만 바뀐 커밋에서 빌드를 건너뛰는지 확인: 2026-11-02 `Merge branch 'dev'`(루트 CLAUDE.md만 변경) 배포가 Deployments에서 Ignored인지 (사용자 확인 대기)
+- [x] 빌드 건너뛰기 스크립트 로컬 검사: 기준 없음·사라진 커밋 → 1(빌드), 문서만 변경 → 0(건너뜀), web/·reports/ 변경 → 1
+- [ ] Vercel에서 확인 (사용자): v0.0.3 배포가 Ready(로그 "기준 커밋…을 찾을 수 없어 빌드합니다"), 그다음 문서만 바뀐 병합 배포는 Ignored
 - [ ] Google Search Console·네이버 서치어드바이저 등록 (사용자): 소유 확인 값을 환경 변수로 넣고 sitemap·RSS 제출
