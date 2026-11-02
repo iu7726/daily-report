@@ -43,13 +43,27 @@
 
    ```yaml
    ---
-   title: "[YYYY-MM-DD 작업 제목]"
-   task: <작업 ID>
-   date: YYYY-MM-DD
-   generated_at: YYYY-MM-DDTHH:mm:ss+09:00
+   title: "AI·개발 도구 브리핑"
+   task: ai-dev-briefing
+   date: 2026-11-03
+   generated_at: 2026-11-03T08:34:00+09:00
+   level: notice
    summary: "보고서 결론 한 줄"
    ---
    ```
+
+   - `title`: 작업 파일의 제목(첫 줄 `#` 제목)을 그대로 쓴다. 날짜와 대괄호는 넣지 않는다.
+   - `task`: 작업 ID
+   - `date`: 실행일의 KST 날짜 (파일 이름과 같음)
+   - `generated_at`: 보고서를 완성한 시각 (KST, `+09:00`)
+   - `level`: 아래 기준 중 하나
+   - `summary`: 보고서 맨 위 결론을 한 줄로 요약. 큰따옴표로 감싸고, 안에 큰따옴표가 들어가면 `\"`로 쓴다.
+
+   | 작업 | `urgent` | `notice` | `normal` |
+   |---|---|---|---|
+   | AI·개발 도구 브리핑 | 실무에 바로 영향 주는 변경(호환성 깨짐, 지원 종료, 보안 수정) | 주요 소식 있음 | 새 소식 없음 |
+   | S&P500 실적·금리 아침 점검 | 결론이 `점검 필요` | 결론이 `주의` | 결론이 `영향 없음` |
+   | IT 보안 이슈 데일리 리포트 | P1 이슈 있음 | P2 이슈만 있음 | P3 이하이거나 이슈 없음 |
 
 4. **커밋·푸시**: 커밋 전에 이 저장소의 작성자를 `git config user.name "MH.js"`, `git config user.email "iu7726@naver.com"`으로 설정한다. 보고서 파일만 `git add` 하고 `report(<작업 ID>): YYYY-MM-DD` 메시지로 커밋한 뒤 `main` 브랜치에 push한다. push가 거부되면 `git pull --rebase origin main` 후 다시 push한다.
 5. 보고서 파일 외의 파일(작업 파일, 이 규칙, 사이트 코드 등)은 수정하지 않는다.
