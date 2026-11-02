@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LevelBadge } from "@/components/LevelBadge";
 import { Markdown } from "@/components/Markdown";
+import { TagChip } from "@/components/TagChip";
 import { formatDateKo, formatDateShortKo } from "@/lib/date";
 import {
   type Report,
@@ -13,6 +14,7 @@ import {
 } from "@/lib/reports";
 import { jsonLd, pageMetadata } from "@/lib/seo";
 import { SITE_NAME, absoluteUrl } from "@/lib/site";
+import { slugifyTag } from "@/lib/tags";
 import { getTaskInfo } from "@/lib/tasks";
 
 export const dynamicParams = false;
@@ -121,11 +123,18 @@ export default async function ReportPage({ params }: PageProps<"/[task]/[date]">
 
         {report.tags.length > 0 && (
           <ul aria-label="태그" className="flex flex-wrap gap-1.5">
-            {report.tags.map((tag) => (
-              <li key={tag} className="rounded-md border border-line px-2 py-0.5 font-mono text-[11px] text-muted">
-                {tag}
-              </li>
-            ))}
+            {report.tags.map((tag) => {
+              const slug = slugifyTag(tag);
+              return (
+                <li key={tag}>
+                  {slug ? (
+                    <TagChip slug={slug} name={tag} />
+                  ) : (
+                    <span className="rounded-md border border-line px-2 py-0.5 font-mono text-[11px] text-muted">{tag}</span>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         )}
       </header>

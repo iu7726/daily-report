@@ -4,6 +4,7 @@ import { parse as parseYaml } from "yaml";
 import { z } from "zod";
 import { isValidDate } from "./date";
 import { isLevel, type Level } from "./level";
+import { buildTags, decodeTagParam, type TagInfo } from "./tags";
 import { TASKS, getTaskInfo, taskOrder } from "./tasks";
 
 export type { Level } from "./level";
@@ -250,6 +251,17 @@ export function getAdjacentDates(date: string): { prev?: string; next?: string }
   const index = dates.indexOf(date);
   if (index === -1) return {};
   return { prev: dates[index + 1], next: dates[index - 1] };
+}
+
+/** 전체 태그 (많이 쓰인 순) */
+export function getAllTags(): TagInfo[] {
+  return buildTags(getAllReports());
+}
+
+/** 주소 값(인코딩돼 있을 수 있음)으로 태그를 찾는다. */
+export function getTag(param: string): TagInfo | undefined {
+  const slug = decodeTagParam(param);
+  return getAllTags().find((tag) => tag.slug === slug);
 }
 
 export type CalendarEntry = { task: string; level: Level };

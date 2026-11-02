@@ -59,7 +59,7 @@ function SiteHeader() {
           </span>
           {SITE_NAME}
         </Link>
-        <nav aria-label="작업" className="-mx-2 flex flex-wrap items-center gap-1 text-sm text-muted">
+        <nav aria-label="메뉴" className="-mx-2 flex flex-wrap items-center gap-1 text-sm text-muted">
           {TASKS.map((task) => (
             <Link
               key={task.id}
@@ -69,6 +69,9 @@ function SiteHeader() {
               {task.shortTitle}
             </Link>
           ))}
+          <Link href="/tags" className="rounded-md px-2 py-1 transition-colors hover:bg-surface-hover hover:text-foreground">
+            태그
+          </Link>
         </nav>
       </div>
     </header>

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { Calendar } from "@/components/Calendar";
+import { TagChip } from "@/components/TagChip";
 import { ReportCard } from "@/components/ReportCard";
 import { formatDateKo, monthKeyOf } from "@/lib/date";
-import { getAllDates, getCalendarEntries, getReportsByDate, getReportsByTask } from "@/lib/reports";
+import { getAllDates, getAllTags, getCalendarEntries, getReportsByDate, getReportsByTask } from "@/lib/reports";
 import { jsonLd, pageMetadata } from "@/lib/seo";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, getSiteUrl } from "@/lib/site";
 import { TASKS } from "@/lib/tasks";
@@ -14,8 +15,14 @@ export const metadata = pageMetadata({
   absoluteTitle: true,
 });
 
+const POPULAR_TAG_COUNT = 12;
+
 export default function HomePage() {
   const dates = getAllDates();
+  // 보고서 2건 이상인 태그만 (태그 기획서 D4)
+  const popularTags = getAllTags()
+    .filter((tag) => tag.indexable)
+    .slice(0, POPULAR_TAG_COUNT);
   const latestDate = dates[0];
   const latest = latestDate ? getReportsByDate(latestDate) : [];
 
@@ -57,6 +64,26 @@ export default function HomePage() {
         <p className="rounded-xl border border-dashed border-line p-10 text-center text-sm text-muted">
           아직 보고서가 없습니다.
         </p>
+      )}
+
+      {popularTags.length > 0 && (
+        <section className="flex flex-col gap-4" aria-labelledby="topics-heading">
+          <div className="flex items-baseline justify-between gap-4">
+            <h2 id="topics-heading" className="text-sm font-semibold tracking-tight">
+              자주 다룬 주제
+            </h2>
+            <Link href="/tags" className="text-xs text-muted hover:text-foreground">
+              전체 태그 →
+            </Link>
+          </div>
+          <ul className="flex flex-wrap gap-2">
+            {popularTags.map((tag) => (
+              <li key={tag.slug}>
+                <TagChip slug={tag.slug} name={tag.name} count={tag.reports.length} />
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       <div className="grid gap-10 md:grid-cols-[minmax(0,22rem)_1fr] md:gap-12">
