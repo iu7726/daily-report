@@ -65,5 +65,6 @@
    | S&P500 실적·금리 아침 점검 | 결론이 `점검 필요` | 결론이 `주의` | 결론이 `영향 없음` |
    | IT 보안 이슈 데일리 리포트 | P1 이슈 있음 | P2 이슈만 있음 | P3 이하이거나 이슈 없음 |
 
-4. **커밋·푸시**: 커밋 전에 이 저장소의 작성자를 `git config user.name "MH.js"`, `git config user.email "iu7726@naver.com"`으로 설정한다. 보고서 파일만 `git add` 하고 `report(<작업 ID>): YYYY-MM-DD` 메시지로 커밋한 뒤 `main` 브랜치에 push한다. push가 거부되면 `git pull --rebase origin main` 후 다시 push한다.
-5. 보고서 파일 외의 파일(작업 파일, 이 규칙, 사이트 코드 등)은 수정하지 않는다.
+4. **커밋·푸시**: 커밋 작성자는 실행 환경의 기본 설정을 그대로 쓴다(`git config`로 바꾸지 않는다). 보고서 파일만 `git add` 하고 `report(<작업 ID>): YYYY-MM-DD` 메시지로 커밋한 뒤 `main` 브랜치에 push한다. push가 거부되면 `git pull --rebase origin main` 후 다시 push한다.
+5. **알림**: 푸시 알림 도구(PushNotification)가 있으면 마지막에 한 번 보낸다. push에 성공했으면 `<title> · <level> · <summary>` 한 줄을 보내고, 실패했으면 실패 사실과 원인을 보낸다.
+6. 보고서 파일 외의 파일(작업 파일, 이 규칙, 사이트 코드 등)은 수정하지 않는다.
