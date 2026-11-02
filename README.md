@@ -64,6 +64,26 @@ flowchart LR
 - 날짜는 KST 문자열로만 다뤄 UTC 빌드 서버에서 하루가 밀리지 않습니다.
 - AI가 쓴 본문은 원시 HTML을 렌더링하지 않습니다.
 
+## 🔐 내 프로젝트 보안 점검 (Claude Code 스킬)
+
+클라우드 루틴은 내 컴퓨터를 볼 수 없어서, 보안 리포트를 **내 프로젝트에 대 보는 일**은 로컬 스킬 [`security-check`](.claude/skills/security-check/SKILL.md)가 맡습니다. 이 저장소를 연 Claude Code에서 이렇게 말하면 됩니다.
+
+```
+보안 점검해 줘
+```
+
+1. 최근 보안 리포트에서 취약한 패키지·런타임과 수정 버전을 뽑고
+2. 옆에 clone해 둔 프로젝트들의 **lockfile에 실제로 설치된 버전**, Dockerfile·CI의 Node 버전, 이 컴퓨터의 Node 버전과 대조해
+3. 프로젝트별로 🔴 즉시 조치 / 🟠 확인 필요 / ✅ 해당 없음과 업데이트 명령을 알려 줍니다.
+
+- **읽기 전용**: 설치·업데이트·커밋을 하지 않습니다. `npm audit`는 의존성 목록이 레지스트리로 전송된다는 안내와 함께 매번 물어본 뒤에만 실행합니다.
+- **결과는 저장소 밖**(`<프로젝트 폴더>/security-check/날짜.md`)에만 저장합니다. 저장소 안 경로는 거부합니다.
+- 처음 실행할 때 점검 대상을 고릅니다. **자동**(폴더 하나 아래를 모두 찾기)이나 **지정**(흩어진 프로젝트 폴더 목록) 중 하나입니다. 설정은 git에 올라가지 않는 `config.local.json`에 저장되고, "점검 대상 바꿔 줘"로 언제든 바꿀 수 있습니다.
+- 다른 프로젝트에서도 쓰려면 사용자 스킬로 링크를 겁니다.
+  ```sh
+  ln -s "$(pwd)/.claude/skills/security-check" ~/.claude/skills/security-check
+  ```
+
 ## 🗂️ 구조
 
 ```
@@ -73,6 +93,7 @@ daily-report/
 ├── web/                # Next.js 정적 사이트
 │   ├── app/            #   홈 · 날짜 · 작업 · 상세 · 태그 · sitemap · RSS · OG
 │   └── lib/            #   보고서 읽기·검증, 날짜, 태그 (vitest 단위 테스트)
+├── .claude/skills/     # Claude Code 스킬 (security-check)
 └── .claude/feature/    # 기능별 기획서와 실행 기록
 ```
 
