@@ -207,6 +207,6 @@ web/
 - [x] 라이트 모드 화면 확인 (`--blink-settings=preferredColorScheme=1`). 태그와 본문 첫 제목 사이 여백이 과해 본문 첫 요소의 위 여백을 0으로 수정
 - [x] Vercel 배포 (2026-11-02, `https://daily-report-ashy-nine.vercel.app`): 17개 경로 200, 없는 경로 404, `x-vercel-cache: HIT`(정적). 글꼴·화면 로컬과 같음
 - [x] `SITE_URL` 없이 `VERCEL_PROJECT_PRODUCTION_URL`로 canonical·og:url·OG 이미지·JSON-LD·sitemap·robots·RSS 절대 주소가 운영 주소로 나옴 (S2)
-- [ ] 보고서 push 후 자동 재배포 (2026-11-03 08:38 루틴으로 확인 예정)
-- [ ] `scheduler/`만 바꾼 커밋에서 빌드를 건너뛰는지 확인 (다음 규칙 수정 때 Deployments에서 Ignored 확인)
+- [x] 보고서 push 후 자동 재배포 (2026-11-02 루틴 재실행): 운영 사이트 제목이 재실행본 headline으로 바뀜
+- [ ] 문서만 바뀐 커밋에서 빌드를 건너뛰는지 확인: 2026-11-02 `Merge branch 'dev'`(루트 CLAUDE.md만 변경) 배포가 Deployments에서 Ignored인지 (사용자 확인 대기)
 - [ ] Google Search Console·네이버 서치어드바이저 등록 (사용자): 소유 확인 값을 환경 변수로 넣고 sitemap·RSS 제출
