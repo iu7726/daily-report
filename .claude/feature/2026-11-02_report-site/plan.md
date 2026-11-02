@@ -210,5 +210,5 @@ web/
 - [x] `SITE_URL` 없이 `VERCEL_PROJECT_PRODUCTION_URL`로 canonical·og:url·OG 이미지·JSON-LD·sitemap·robots·RSS 절대 주소가 운영 주소로 나옴 (S2)
 - [x] 보고서 push 후 자동 재배포 (2026-11-02 루틴 재실행): 운영 사이트 제목이 재실행본 headline으로 바뀜
 - [x] 빌드 건너뛰기 스크립트 로컬 검사: 기준 없음·사라진 커밋 → 1(빌드), 문서만 변경 → 0(건너뜀), web/·reports/ 변경 → 1
-- [ ] Vercel에서 확인 (사용자): v0.0.3 배포가 Ready(로그 "기준 커밋…을 찾을 수 없어 빌드합니다"), 그다음 문서만 바뀐 병합 배포는 Ignored
+- [x] Vercel에서 확인 (사용자, 2026-11-02): v0.0.3 배포 후 문서만 바뀐 병합(README 추가 `5b3b0b0`) 배포가 Ignored
 - [ ] Google Search Console·네이버 서치어드바이저 등록 (사용자): 소유 확인 값을 환경 변수로 넣고 sitemap·RSS 제출
