@@ -1,0 +1,115 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* 무채색 바탕 + 1px 테두리. 색은 level 상태에만 쓴다(기획서 D12). */
+:root {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --muted: #71717a;
+  --subtle: #a1a1aa;
+  --line: #e4e4e7;
+  --surface: #fafafa;
+  --surface-hover: #f4f4f5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --muted: #a1a1aa;
+    --subtle: #71717a;
+    --line: #27272a;
+    --surface: #111113;
+    --surface-hover: #18181b;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-line: var(--line);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --font-sans:
+    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo",
+    "Noto Sans KR", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  /* 한글이 음절 중간에서 끊기지 않게 */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--foreground) 15%, transparent);
+}
+
+/* 보고서 본문 */
+.report-prose {
+  --tw-prose-body: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-links: var(--foreground);
+  --tw-prose-bullets: var(--subtle);
+  --tw-prose-counters: var(--muted);
+  --tw-prose-quotes: var(--muted);
+  --tw-prose-quote-borders: var(--line);
+  --tw-prose-hr: var(--line);
+  --tw-prose-th-borders: var(--line);
+  --tw-prose-td-borders: var(--line);
+  --tw-prose-code: var(--foreground);
+}
+
+.report-prose a {
+  text-decoration-color: var(--subtle);
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+.report-prose a:hover {
+  text-decoration-color: var(--foreground);
+}
+
+.report-prose code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  font-weight: 500;
+  padding: 0.1em 0.35em;
+  border-radius: 0.3rem;
+  background: var(--surface-hover);
+}
+
+.report-prose code::before,
+.report-prose code::after {
+  content: none;
+}
+
+.report-prose table {
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.report-prose thead th {
+  white-space: nowrap;
+}
+
+.report-prose blockquote {
+  font-style: normal;
+}
+
+.report-prose blockquote p:first-of-type::before,
+.report-prose blockquote p:last-of-type::after {
+  content: none;
+}
