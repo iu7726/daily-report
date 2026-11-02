@@ -7,7 +7,7 @@
 | 경로 | 내용 |
 |---|---|
 | `scheduler/` | 루틴이 실행하는 작업 프롬프트. 공통 실행 규칙은 `scheduler/CLAUDE.md` |
-| `reports/<작업 ID>/YYYY-MM-DD.md` | 루틴이 만든 보고서. frontmatter 정의는 `scheduler/CLAUDE.md`의 '결과 저장' |
+| `reports/<작업 ID>/YYYY/MM/DD.md` | 루틴이 만든 보고서. frontmatter 정의는 `scheduler/CLAUDE.md`의 '결과 저장' |
 | `web/` | 보고서 사이트 (Next.js, Vercel 배포) |
 | `.claude/feature/` | 기능별 작업 히스토리 (기획서와 실행 결과) |
 

@@ -17,6 +17,8 @@ describe("loadReports", () => {
       "security-daily-report/2026-11-02",
       "zz-new-task/2026-11-02",
       "ai-dev-briefing/2026-11-01",
+      "ai-dev-briefing/2026-10-31",
+      "ai-dev-briefing/2026-10-30",
     ]);
   });
 
@@ -80,6 +82,25 @@ describe("loadReports", () => {
         expect.stringContaining("security-daily-report/2026-11-02.md: frontmatter task(security-report)"),
         expect.stringContaining("security-daily-report/2026-11-02.md: frontmatter date(2026-11-03)"),
         expect.stringContaining("security-daily-report/2026-11-02.md: 알 수 없는 level(high)"),
+      ]),
+    );
+  });
+
+  it("새 구조(YYYY/MM/DD.md)를 읽는다", () => {
+    expect(find("ai-dev-briefing", "2026-10-31")).toMatchObject({ level: "urgent", headline: "새 구조 파일" });
+  });
+
+  it("같은 날짜가 예전 구조와 새 구조에 다 있으면 새 구조를 쓰고 경고한다", () => {
+    expect(find("ai-dev-briefing", "2026-10-30")?.headline).toBe("새 구조");
+    expect(reports.filter((r) => r.task === "ai-dev-briefing" && r.date === "2026-10-30")).toHaveLength(1);
+    expect(warnings).toContainEqual(expect.stringContaining("ai-dev-briefing/2026/10/30.md: 같은 날짜(2026-10-30)"));
+  });
+
+  it("새 구조에서 없는 날짜·연도 폴더가 아닌 폴더는 건너뛴다", () => {
+    expect(warnings).toEqual(
+      expect.arrayContaining([
+        expect.stringMatching(/^sp500-morning-check\/2026\/02\/30\.md: 파일 이름이 DD\.md 형식이 아니거나 없는 날짜라/),
+        expect.stringMatching(/^security-daily-report\/26\/: 연도 폴더/),
       ]),
     );
   });
