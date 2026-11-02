@@ -51,5 +51,5 @@
    ---
    ```
 
-4. **커밋·푸시**: 보고서 파일만 `git add` 하고 `report(<작업 ID>): YYYY-MM-DD` 메시지로 커밋한 뒤 `main` 브랜치에 push한다. push가 거부되면 `git pull --rebase origin main` 후 다시 push한다.
+4. **커밋·푸시**: 커밋 전에 이 저장소의 작성자를 `git config user.name "MH.js"`, `git config user.email "iu7726@naver.com"`으로 설정한다. 보고서 파일만 `git add` 하고 `report(<작업 ID>): YYYY-MM-DD` 메시지로 커밋한 뒤 `main` 브랜치에 push한다. push가 거부되면 `git pull --rebase origin main` 후 다시 push한다.
 5. 보고서 파일 외의 파일(작업 파일, 이 규칙, 사이트 코드 등)은 수정하지 않는다.
