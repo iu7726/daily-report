@@ -148,17 +148,69 @@ export function compareReports(a: Report, b: Report): number {
   return a.task.localeCompare(b.task);
 }
 
-/** `<dir>/<작업 ID>/YYYY-MM-DD.md`를 모두 읽는다. 읽을 수 없는 파일은 경고와 함께 제외한다. */
+const YEAR_RE = /^\d{4}$/;
+const MONTH_RE = /^\d{2}$/;
+const DAY_FILE_RE = /^(\d{2})\.md$/;
+
+const listDir = (dir: string) => fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name));
+
+/**
+ * 작업 폴더 안의 보고서 파일과 날짜를 찾는다.
+ * - 현재 구조: `<작업 ID>/YYYY/MM/DD.md`
+ * - 예전 구조: `<작업 ID>/YYYY-MM-DD.md` (옮기기 전 파일이나 예전 규칙으로 쓴 파일도 읽는다)
+ */
+function findReportFiles(taskDir: string, task: string, warnings: string[]) {
+  const found: { file: string; where: string; date: string }[] = [];
+  const skip = (where: string, why: string) => warnings.push(`${where}: ${why} 건너뜀`);
+  const entries = listDir(taskDir);
+
+  // 예전 구조를 먼저 읽고 새 구조를 나중에 읽는다. 같은 날짜가 둘 다 있으면 나중 것(새 구조)이 남는다.
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.endsWith(".md")) continue;
+    const where = `${task}/${entry.name}`;
+    const date = entry.name.slice(0, -".md".length);
+    if (isValidDate(date)) found.push({ file: path.join(taskDir, entry.name), where, date });
+    else skip(where, "파일 이름이 YYYY/MM/DD.md(또는 YYYY-MM-DD.md) 형식이 아니라");
+  }
+
+  for (const entry of entries) {
+    const where = `${task}/${entry.name}`;
+    if (!entry.isDirectory()) continue;
+    if (!YEAR_RE.test(entry.name)) {
+      skip(`${where}/`, "연도 폴더(YYYY)가 아니라");
+      continue;
+    }
+    for (const month of listDir(path.join(taskDir, entry.name))) {
+      const monthWhere = `${where}/${month.name}`;
+      if (!month.isDirectory() || !MONTH_RE.test(month.name)) {
+        if (month.isDirectory() || month.name.endsWith(".md")) skip(monthWhere, "월 폴더(MM)가 아니라");
+        continue;
+      }
+      for (const day of listDir(path.join(taskDir, entry.name, month.name))) {
+        if (!day.isFile() || !day.name.endsWith(".md")) continue;
+        const dayWhere = `${monthWhere}/${day.name}`;
+        const match = DAY_FILE_RE.exec(day.name);
+        const date = match ? `${entry.name}-${month.name}-${match[1]}` : "";
+        if (match && isValidDate(date)) {
+          found.push({ file: path.join(taskDir, entry.name, month.name, day.name), where: dayWhere, date });
+        } else {
+          skip(dayWhere, "파일 이름이 DD.md 형식이 아니거나 없는 날짜라");
+        }
+      }
+    }
+  }
+  return found;
+}
+
+/** `<dir>/<작업 ID>/YYYY/MM/DD.md`(예전 `YYYY-MM-DD.md`도)를 모두 읽는다. 읽을 수 없는 파일은 경고와 함께 제외한다. */
 export function loadReports(dir: string): LoadResult {
   const reports: Report[] = [];
   const warnings: string[] = [];
   if (!fs.existsSync(dir)) return { reports, warnings };
 
-  const taskDirs = fs
-    .readdirSync(dir, { withFileTypes: true })
+  const taskDirs = listDir(dir)
     .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .sort();
+    .map((entry) => entry.name);
 
   for (const task of taskDirs) {
     if (!TASK_ID_RE.test(task)) {
@@ -166,25 +218,18 @@ export function loadReports(dir: string): LoadResult {
       continue;
     }
 
-    const files = fs
-      .readdirSync(path.join(dir, task), { withFileTypes: true })
-      .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
-      .map((entry) => entry.name)
-      .sort();
-
-    for (const file of files) {
-      const where = `${task}/${file}`;
-      const date = file.slice(0, -".md".length);
-      if (!isValidDate(date)) {
-        warnings.push(`${where}: 파일 이름이 YYYY-MM-DD.md 형식이 아니라 건너뜀`);
-        continue;
-      }
-
-      const raw = fs.readFileSync(path.join(dir, task, file), "utf8");
-      const result = parseReport(raw, task, date);
+    const byDate = new Map<string, Report>();
+    for (const { file, where, date } of findReportFiles(path.join(dir, task), task, warnings)) {
+      const result = parseReport(fs.readFileSync(file, "utf8"), task, date);
       warnings.push(...result.warnings.map((warning) => `${where}: ${warning}`));
-      if (result.report) reports.push(result.report);
+      if (!result.report) continue;
+      if (byDate.has(date)) {
+        // 같은 날짜가 두 구조에 다 있으면 새 구조(YYYY/MM/DD.md)를 쓴다. 폴더 순서상 새 구조가 나중에 읽힌다.
+        warnings.push(`${where}: 같은 날짜(${date}) 보고서가 두 곳에 있어 이 파일을 씀`);
+      }
+      byDate.set(date, result.report);
     }
+    reports.push(...byDate.values());
   }
 
   reports.sort(compareReports);
