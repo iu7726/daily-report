@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Calendar } from "@/components/Calendar";
+import { SkillCallout } from "@/components/SkillCallout";
 import { TagChip } from "@/components/TagChip";
 import { ReportCard } from "@/components/ReportCard";
 import { formatDateKo, monthKeyOf } from "@/lib/date";
@@ -126,6 +127,8 @@ export default function HomePage() {
           </ul>
         </section>
       </div>
+
+      <SkillCallout />
     </div>
   );
 }
