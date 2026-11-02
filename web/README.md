@@ -13,13 +13,13 @@ npm test        # lib/ 단위 테스트 (vitest)
 
 ## 환경 변수
 
-`.env.example` 참고. 모두 선택이다.
+`.env.example` 참고. 모두 선택이다. 소유 확인용 HTML 파일(`public/google*.html`, `public/naver*.html`)도 함께 둔다.
 
 | 이름 | 용도 |
 |---|---|
 | `SITE_URL` | canonical, sitemap, RSS, OG의 절대 주소. 없으면 Vercel 운영 주소 → localhost |
-| `GOOGLE_SITE_VERIFICATION` | Google Search Console 소유 확인 메타 태그 |
-| `NAVER_SITE_VERIFICATION` | 네이버 서치어드바이저 소유 확인 메타 태그 |
+| `GOOGLE_SITE_VERIFICATION` | Google Search Console 소유 확인 메타 태그. 없으면 `lib/site.ts`의 기본값 |
+| `NAVER_SITE_VERIFICATION` | 네이버 서치어드바이저 소유 확인 메타 태그. 없으면 `lib/site.ts`의 기본값 |
 | `REPORTS_DIR` | 보고서 폴더 위치. 없으면 `../reports` |
 
 ## 구조

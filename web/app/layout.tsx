@@ -4,16 +4,21 @@ import Link from "next/link";
 import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
 import "./globals.css";
 import { RSS_ALTERNATE } from "@/lib/seo";
-import { REPO_URL, SITE_DESCRIPTION, SITE_LOCALE, SITE_NAME, getSiteUrl } from "@/lib/site";
+import {
+  GOOGLE_SITE_VERIFICATION,
+  NAVER_SITE_VERIFICATION,
+  REPO_URL,
+  SITE_DESCRIPTION,
+  SITE_LOCALE,
+  SITE_NAME,
+  getSiteUrl,
+} from "@/lib/site";
 import { TASKS } from "@/lib/tasks";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
-const googleVerification = process.env.GOOGLE_SITE_VERIFICATION?.trim();
-const naverVerification = process.env.NAVER_SITE_VERIFICATION?.trim();
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
@@ -25,8 +30,8 @@ export const metadata: Metadata = {
   openGraph: { type: "website", siteName: SITE_NAME, locale: SITE_LOCALE },
   twitter: { card: "summary_large_image" },
   verification: {
-    ...(googleVerification ? { google: googleVerification } : {}),
-    ...(naverVerification ? { other: { "naver-site-verification": naverVerification } } : {}),
+    google: GOOGLE_SITE_VERIFICATION,
+    other: { "naver-site-verification": NAVER_SITE_VERIFICATION },
   },
 };
 

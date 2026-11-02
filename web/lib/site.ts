@@ -24,3 +24,9 @@ export function getSiteUrl(): string {
 export function absoluteUrl(pathname: string): string {
   return new URL(pathname, `${getSiteUrl()}/`).toString();
 }
+
+// 검색엔진 소유 확인 값. 페이지 HTML에 그대로 공개되는 값이라 코드에 둔다. 환경 변수가 있으면 그 값을 쓴다.
+export const GOOGLE_SITE_VERIFICATION =
+  process.env.GOOGLE_SITE_VERIFICATION?.trim() || "Fv0IyKiStT2hI837Jljo0DkLjOlG8gcIKwfaee_6wRI";
+export const NAVER_SITE_VERIFICATION =
+  process.env.NAVER_SITE_VERIFICATION?.trim() || "6d486a9423b8af71b62e9be0ae8f11df01dd70f3";
