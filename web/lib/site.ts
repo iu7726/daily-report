@@ -10,6 +10,9 @@ export const SITE_LOCALE = "ko_KR";
 
 export const REPO_URL = "https://github.com/iu7726/daily-report";
 
+/** 보안 리포트를 로컬 프로젝트에 대 보는 Claude Code 스킬 설명 */
+export const SECURITY_SKILL_URL = `${REPO_URL}/blob/main/.claude/skills/security-check/SKILL.md`;
+
 /** canonical·sitemap·RSS·OG에 쓰는 사이트 절대 주소. SITE_URL → Vercel 운영 주소 → localhost 순서. */
 export function getSiteUrl(): string {
   const explicit = process.env.SITE_URL?.trim();
