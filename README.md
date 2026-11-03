@@ -27,7 +27,7 @@
 | 08:42 | **AI·개발 도구** | OpenAI, Gemini, Claude, MCP 생태계와 AI 개발 도구의 새 소식, 주목할 Agent Skills, 백엔드(Node.js·TypeScript) 적용점 |
 | 08:55 | **S&P500 실적·금리** | 직전 거래일 종가, 기업 실적, Fed 금리, 미 국채, VIX, 원/달러 환율, 이번 주 일정 |
 
-보안 리포트가 "오늘 중 보안 릴리스 예정"처럼 곧 나올 것을 발견하면, **3시간마다 도는 후속 확인 루틴**이 원문을 확인해 나오는 대로 리포트에 덧붙이고 휴대폰으로 알립니다.
+보안 리포트 사이의 빈틈은 **3시간마다 도는 후속 확인·긴급 감시 루틴**이 메웁니다. 아침 리포트가 "오늘 중 보안 릴리스 예정"으로 남긴 것이 나오거나, 핵심 기술에 P1급 공지(CISA KEV 신규 등재, 핵심 패키지의 Critical 권고, 인기 패키지 변조, Node.js 보안 릴리스, 핵심 AWS 서비스 공지)가 뜨면 바로 리포트에 덧붙이고 휴대폰으로 알립니다.
 
 보고서마다 `긴급 · 주의 · 보통` 세 단계 판정이 붙어서, 캘린더의 색 점만 봐도 그날 챙길 게 있는지 알 수 있습니다.
 
@@ -94,7 +94,7 @@ flowchart LR
 daily-report/
 ├── scheduler/          # 루틴 프롬프트 (공통 규칙 + 작업 3개)
 ├── reports/            # 루틴이 쓴 보고서 (작업/년/월/일.md)
-├── watch/              # 보안 후속 확인 대기 목록
+├── watch/              # 보안 후속 확인 대기 목록, 긴급 감시로 알린 기록
 ├── web/                # Next.js 정적 사이트
 │   ├── app/            #   홈 · 날짜 · 작업 · 상세 · 태그 · sitemap · RSS · OG
 │   └── lib/            #   보고서 읽기·검증, 날짜, 태그 (vitest 단위 테스트)
@@ -123,6 +123,7 @@ daily-report/
 | 보고서 목차·날짜 목록 | [`2026-11-03_report-toc/plan.md`](.claude/feature/2026-11-03_report-toc/plan.md) |
 | 방문 통계 | [`2026-11-03_web-analytics/plan.md`](.claude/feature/2026-11-03_web-analytics/plan.md) |
 | 보안 리포트 분야별 확대 | [`2026-11-03_security-categories/plan.md`](.claude/feature/2026-11-03_security-categories/plan.md) |
+| 보안 긴급 감시 | [`2026-11-03_security-urgent-watch/plan.md`](.claude/feature/2026-11-03_security-urgent-watch/plan.md) |
 
 기획서에는 결정 사항과 그 이유, 예외 케이스 목록, 계획과 달라진 점, 실제로 돌려 본 검증 결과가 들어 있습니다.
 
