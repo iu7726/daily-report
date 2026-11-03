@@ -60,3 +60,17 @@ describe("getHeadings", () => {
     expect(html).toContain('<h4 id="4단계는-목차에-없다"');
   });
 });
+
+describe("물결표 취소선", () => {
+  const render = (md: string) => renderToStaticMarkup(createElement(Markdown, null, md));
+
+  it("범위 물결표가 한 줄에 두 번 나와도 취소선이 되지 않는다", () => {
+    const html = render("10월 29일 09:27~20:35 UTC(18:27~05:35 KST)에 배포됐습니다.");
+    expect(html).not.toContain("<del>");
+    expect(html).toContain("09:27~20:35 UTC(18:27~05:35 KST)");
+  });
+
+  it("물결표 두 개(~~)는 표준대로 취소선이다", () => {
+    expect(render("~~취소~~")).toContain("<del>취소</del>");
+  });
+});
