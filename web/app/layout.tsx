@@ -47,7 +47,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="ko" className={`${geistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <SiteHeader />
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6 sm:py-14">{children}</main>
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6 sm:py-14">{children}</main>
         <SiteFooter />
       </body>
     </html>
@@ -57,7 +57,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 function SiteHeader() {
   return (
     <header className="sticky top-0 z-10 border-b border-line bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 sm:px-6">
+      <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 sm:px-6">
         <Link href="/" className="flex items-center gap-2 text-sm font-semibold tracking-tight">
           <span aria-hidden className="grid size-5 place-items-center rounded-[5px] bg-foreground text-[11px] font-bold text-background">
             D
@@ -86,7 +86,7 @@ function SiteHeader() {
 function SiteFooter() {
   return (
     <footer className="border-t border-line">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 py-8 text-xs leading-relaxed text-muted sm:px-6">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 text-xs leading-relaxed text-muted sm:px-6">
         <p className="max-w-2xl">
           모든 보고서는 AI가 공개 자료를 바탕으로 자동 작성했습니다. 내용이 틀리거나 늦을 수 있으니 중요한 판단 전에는
           보고서에 연결된 원문을 확인하세요. 시장 관련 내용은 정보 제공용이며 투자 권유가 아닙니다.

@@ -307,6 +307,14 @@ export function getAdjacentInTask(task: string, date: string): { prev?: Report; 
   return { prev: list[index + 1], next: list[index - 1] };
 }
 
+/** 최신순 목록에서 date를 가운데 둔 size개 구간. 앞뒤가 모자라면 반대쪽으로 채우고, 목록이 짧으면 있는 만큼만. */
+export function pickAround<T extends { date: string }>(list: T[], date: string, size: number): T[] {
+  const index = list.findIndex((item) => item.date === date);
+  if (index === -1) return list.slice(0, size);
+  const start = Math.max(0, Math.min(index - Math.floor(size / 2), list.length - size));
+  return list.slice(start, start + size);
+}
+
 /** 보고서가 있는 이전·다음 날짜 */
 export function getAdjacentDates(date: string): { prev?: string; next?: string } {
   const dates = getAllDates();
