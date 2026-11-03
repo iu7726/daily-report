@@ -12,6 +12,8 @@
 | `web/` | 보고서 사이트 (Next.js, Vercel 배포) |
 | `.claude/feature/` | 기능별 작업 히스토리 (기획서와 실행 결과) |
 | `.claude/skills/security-check/` | 보안 리포트를 로컬 프로젝트에 대 보는 스킬 (로컬 전용, 읽기 전용) |
+| `.github/` | 이슈·PR 템플릿, 보안 정책, 행동 강령, 기여 안내 |
+| `LICENSE`, `reports/LICENSE` | 코드·프롬프트는 MIT, 보고서 글은 CC BY 4.0 |
 
 ## 루틴으로 실행된 세션
 
