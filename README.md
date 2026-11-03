@@ -99,7 +99,8 @@ daily-report/
 │   ├── app/            #   홈 · 날짜 · 작업 · 상세 · 태그 · sitemap · RSS · OG
 │   └── lib/            #   보고서 읽기·검증, 날짜, 태그 (vitest 단위 테스트)
 ├── .claude/skills/     # Claude Code 스킬 (security-check)
-└── .claude/feature/    # 기능별 기획서와 실행 기록
+├── .claude/feature/    # 기능별 기획서와 실행 기록
+└── .github/            # 이슈·PR 템플릿, 보안 정책, 행동 강령, 기여 안내
 ```
 
 | | |
@@ -124,6 +125,8 @@ daily-report/
 | 방문 통계 | [`2026-11-03_web-analytics/plan.md`](.claude/feature/2026-11-03_web-analytics/plan.md) |
 | 보안 리포트 분야별 확대 | [`2026-11-03_security-categories/plan.md`](.claude/feature/2026-11-03_security-categories/plan.md) |
 | 보안 긴급 감시 | [`2026-11-03_security-urgent-watch/plan.md`](.claude/feature/2026-11-03_security-urgent-watch/plan.md) |
+| 물결표 취소선 수정 | [`2026-11-03_tilde-strikethrough/plan.md`](.claude/feature/2026-11-03_tilde-strikethrough/plan.md) |
+| 라이선스·보안 정책·템플릿 | [`2026-11-03_community-files/plan.md`](.claude/feature/2026-11-03_community-files/plan.md) |
 
 기획서에는 결정 사항과 그 이유, 예외 케이스 목록, 계획과 달라진 점, 실제로 돌려 본 검증 결과가 들어 있습니다.
 
@@ -142,6 +145,20 @@ npm run build    # 정적 빌드
 ```
 
 보고서는 `../reports`에서 읽습니다. 환경 변수는 [`web/.env.example`](web/.env.example)을, 루틴 설정은 [`scheduler/README.md`](scheduler/README.md)를 참고하세요.
+
+## 🤝 제보·기여
+
+- 보고서 내용이 틀렸다면: [보고서 정정 요청](https://github.com/iu7726/daily-report/issues/new?template=report-correction.yml)
+- 사이트가 이상하다면: [사이트 오류](https://github.com/iu7726/daily-report/issues/new?template=site-bug.yml)
+- 다뤘으면 하는 분야나 기능이 있다면: [제안](https://github.com/iu7726/daily-report/issues/new?template=suggestion.yml)
+- 보안 문제는 공개 이슈 대신 [보안 정책](.github/SECURITY.md)의 비공개 신고로 알려 주세요.
+
+코드 기여 방법은 [기여 안내](.github/CONTRIBUTING.md)를, 지켜 주실 것은 [행동 강령](.github/CODE_OF_CONDUCT.md)을 봐 주세요.
+
+## 📄 라이선스
+
+- 코드와 루틴 작업 프롬프트: [MIT](LICENSE)
+- 보고서 글(`reports/`): [CC BY 4.0](reports/LICENSE). 출처를 밝히면 자유롭게 쓸 수 있습니다. 보고서에 인용한 원문은 각 원저작자의 권리를 따릅니다.
 
 ---
 

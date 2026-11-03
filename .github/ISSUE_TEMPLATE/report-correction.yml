@@ -1,0 +1,36 @@
+name: 보고서 정정 요청
+description: 보고서 내용이 틀렸거나 그 뒤로 바뀐 것을 알려 주세요.
+title: "[정정] "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        보고서는 AI가 공개 자료를 바탕으로 매일 자동으로 씁니다. 틀린 버전이나 날짜, 바뀐 공지, 끊긴 링크를 알려 주시면 확인한 뒤 보고서나 작업 규칙에 반영합니다.
+  - type: input
+    id: report-url
+    attributes:
+      label: 보고서 주소
+      placeholder: https://daily-report-ashy-nine.vercel.app/security-daily-report/2026-11-03
+    validations:
+      required: true
+  - type: textarea
+    id: wrong
+    attributes:
+      label: 틀린 내용
+      description: 보고서의 해당 문장이나 항목을 옮겨 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: correct
+    attributes:
+      label: 바른 내용과 근거
+      description: 공식 공지, 보안 권고, 릴리스 노트 같은 원문 링크를 함께 적어 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: 덧붙일 말
+    validations:
+      required: false
