@@ -1,7 +1,7 @@
 # 커뮤니티 문서 (라이선스·보안 정책·템플릿) — 기획서
 
 > 상태: **구현·검증 완료 (2026-11-03)**. `web/` 변경 없어 태그 없음
-> 남은 것: 이슈 템플릿 선택 화면 확인(로그인 필요, 사용자)
+> 남은 것: 없음
 >
 > 구현 변경점 (계획 대비):
 > - `reports/LICENSE` 맨 위에 적용 범위, 출처 표기 예, 인용 원문의 권리, 무보증을 한국어로 적고 그 아래에 CC BY 4.0 전문을 붙였다.
@@ -69,5 +69,5 @@ README(구조, 제보·기여, 라이선스 절, 기획서 표)와 루트 `CLAUD
 
 - [x] 이슈 템플릿 YAML 4개 파싱(Ruby YAML): config, 보고서 정정 요청(항목 5), 사이트 오류(3), 제안(2)
 - [x] `npm test` 57/57, `npm run build` 정적 페이지 226개, `reports/LICENSE`로 인한 경고 없음
-- [x] 병합 후 커뮤니티 API(`/repos/iu7726/daily-report/community/profile`): health 28 → 100. 라이선스 MIT로 인식, 행동 강령·기여 안내·PR 템플릿 ○. 이슈 템플릿은 API 값이 ×로 나와 선택 화면(`/issues/new/choose`, 로그인 필요)으로 확인한다.
+- [x] 병합 후 커뮤니티 API(`/repos/iu7726/daily-report/community/profile`): health 28 → 100. 라이선스 MIT로 인식, 행동 강령·기여 안내·PR 템플릿 ○. 이슈 템플릿은 API 값이 ×로 나오지만, 선택 화면(`/issues/new/choose`, 로그인 필요)에 템플릿이 열리는 것을 사용자가 확인했다.
 - [x] 비공개 취약점 신고: 사용자가 켬, API `private-vulnerability-reporting` → `enabled: true`, Security 탭에 "Report a vulnerability" 표시
