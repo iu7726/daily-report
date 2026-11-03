@@ -1,0 +1,21 @@
+{
+  "items": [
+    {
+      "id": "nextjs-security-release-2026-11",
+      "title": "Next.js 11월 보안 릴리스",
+      "check": "Next.js 보안 블로그나 GitHub 보안 권고에 2026년 11월 보안 릴리스(Medium 7건 예고)의 영향 버전, 수정 버전, CVE가 공개됨",
+      "sources": [
+        "https://nextjs.org/blog/security",
+        "https://nextjs.org/blog/upcoming-nextjs-security-release-november-2026",
+        "https://github.com/vercel/next.js/security/advisories",
+        "https://github.com/vercel/next.js/releases"
+      ],
+      "report": "reports/security-daily-report/2026/11/03.md",
+      "created": "2026-11-03",
+      "until": "2026-11-06",
+      "status": "open",
+      "done_at": null,
+      "result": null
+    }
+  ]
+}

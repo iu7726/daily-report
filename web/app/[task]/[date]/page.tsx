@@ -112,6 +112,14 @@ export default async function ReportPage({ params }: PageProps<"/[task]/[date]">
               </span>
             </span>
           )}
+          {report.generator === "chatgpt" && (
+            <span className="inline-flex items-center gap-3">
+              <span aria-hidden className="text-subtle">
+                ·
+              </span>
+              <span>ChatGPT에서 옮겨 온 보고서</span>
+            </span>
+          )}
         </div>
 
         {report.summary && (

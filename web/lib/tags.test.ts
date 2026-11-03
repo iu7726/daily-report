@@ -13,6 +13,7 @@ const report = (date: string, task: string, tags: string[]): Report => ({
   description: "",
   generatedAt: null,
   baseTime: null,
+  generator: null,
   body: "",
 });
 

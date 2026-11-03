@@ -1,10 +1,10 @@
 /** 사이트 이름. 바꾸려면 이 값만 고친다. */
 export const SITE_NAME = "Daily Report";
 
-export const SITE_TAGLINE = "매일 아침, AI가 정리하는 개발·시장·보안 브리핑";
+export const SITE_TAGLINE = "매일 아침, AI가 정리하는 보안·개발·시장 브리핑";
 
 export const SITE_DESCRIPTION =
-  "AI가 매일 아침 공개 자료를 조사해 정리하는 AI·개발 도구 소식, S&P500 시장 점검, IT 보안 이슈 리포트입니다.";
+  "AI가 매일 아침 공개 자료를 조사해 정리하는 IT 보안 이슈 리포트, AI·개발 도구 소식, S&P500 시장 점검입니다.";
 
 export const SITE_LOCALE = "ko_KR";
 
