@@ -1,5 +1,6 @@
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { remarkHeadingIds } from "@/lib/headings";
 
 // 보고서 본문은 웹 자료를 바탕으로 AI가 쓴 글이다. 원시 HTML은 렌더링하지 않는다(기획서 D4, rehype-raw 미사용).
 // react-markdown은 기본으로 HTML을 글자 그대로 두고, javascript: 같은 위험한 URL을 지운다.
@@ -30,7 +31,7 @@ const components: Components = {
 export function Markdown({ children }: { children: string }) {
   return (
     <div className="report-prose prose prose-zinc max-w-none [&>*:first-child]:mt-0 dark:prose-invert prose-headings:tracking-tight prose-h2:mt-12 prose-h2:text-xl prose-h3:text-base prose-a:font-normal prose-li:my-1 prose-table:my-0">
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+      <ReactMarkdown remarkPlugins={[remarkGfm, remarkHeadingIds]} components={components}>
         {children}
       </ReactMarkdown>
     </div>
