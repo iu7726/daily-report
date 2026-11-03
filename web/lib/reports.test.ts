@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { loadReports, parseReport, stripLeadingLines } from "./reports";
+import { loadReports, parseReport, stripImportNotice, stripLeadingLines } from "./reports";
 
 const FIXTURES = path.join(__dirname, "__fixtures__", "reports");
 
@@ -13,8 +13,8 @@ describe("loadReports", () => {
 
   it("읽을 수 있는 보고서만 최신 날짜 → 작업 순서로 정렬한다 (A5)", () => {
     expect(reports.map((report) => `${report.task}/${report.date}`)).toEqual([
-      "ai-dev-briefing/2026-11-02",
       "security-daily-report/2026-11-02",
+      "ai-dev-briefing/2026-11-02",
       "zz-new-task/2026-11-02",
       "ai-dev-briefing/2026-11-01",
       "ai-dev-briefing/2026-10-31",
@@ -154,5 +154,28 @@ describe("stripLeadingLines (D10, C5)", () => {
       body: "## 오늘의 요약\n기준 시각: 09:30",
       baseTime: null,
     });
+  });
+});
+
+describe("ChatGPT 이전 안내 (generator: chatgpt)", () => {
+  const NOTICE = "> 이 보고서는 ChatGPT 예약 작업으로 작성된 것을 옮겨 왔습니다.";
+  const raw = (generator: string) =>
+    `---\ntitle: "AI·개발 도구 브리핑"\nsummary: "요약"\n${generator}---\n[2026-10-29 AI·개발 도구 브리핑]\n기준 시각: 2026-10-29 08:31 KST\n\n${NOTICE}\n\n## 오늘의 요약\n`;
+
+  it("generator가 chatgpt면 본문 맨 앞의 안내 인용을 떼고 generator를 남긴다", () => {
+    const { report } = parseReport(raw("generator: chatgpt\n"), "ai-dev-briefing", "2026-10-29");
+    expect(report?.generator).toBe("chatgpt");
+    expect(report?.body).toBe("## 오늘의 요약");
+  });
+
+  it("generator가 없으면 본문을 그대로 둔다", () => {
+    const { report } = parseReport(raw(""), "ai-dev-briefing", "2026-10-29");
+    expect(report?.generator).toBeNull();
+    expect(report?.body.startsWith(NOTICE)).toBe(true);
+  });
+
+  it("본문 중간의 같은 문장이나 다른 인용은 건드리지 않는다", () => {
+    expect(stripImportNotice("> 강조 문장\n\n본문")).toBe("> 강조 문장\n\n본문");
+    expect(stripImportNotice(`본문\n\n${NOTICE}`)).toBe(`본문\n\n${NOTICE}`);
   });
 });
