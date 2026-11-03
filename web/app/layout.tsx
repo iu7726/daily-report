@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono } from "next/font/google";
 import Link from "next/link";
@@ -49,6 +50,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteHeader />
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6 sm:py-14">{children}</main>
         <SiteFooter />
+        {/* 쿠키 없는 방문 통계. Vercel에 배포된 사이트에서만 수집하고 개발 모드에서는 수집하지 않는다. */}
+        <Analytics />
       </body>
     </html>
   );
@@ -89,7 +92,8 @@ function SiteFooter() {
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 text-xs leading-relaxed text-muted sm:px-6">
         <p className="max-w-2xl">
           모든 보고서는 AI가 공개 자료를 바탕으로 자동 작성했습니다. 내용이 틀리거나 늦을 수 있으니 중요한 판단 전에는
-          보고서에 연결된 원문을 확인하세요. 시장 관련 내용은 정보 제공용이며 투자 권유가 아닙니다.
+          보고서에 연결된 원문을 확인하세요. 시장 관련 내용은 정보 제공용이며 투자 권유가 아닙니다. 방문 통계는 쿠키
+          없이 Vercel Web Analytics로 집계합니다.
         </p>
         <div className="flex gap-4">
           <a href="/feed.xml" className="hover:text-foreground">
