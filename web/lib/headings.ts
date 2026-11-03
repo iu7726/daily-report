@@ -4,6 +4,7 @@ import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import { unified } from "unified";
 import { visit } from "unist-util-visit";
+import { REMARK_GFM_OPTIONS } from "./markdown";
 
 /** 목차 항목. 본문의 h1은 화면에서 h2로 낮추므로(Markdown.tsx) depth는 2 또는 3이다. */
 export type TocHeading = { id: string; text: string; depth: 2 | 3 };
@@ -61,5 +62,5 @@ export function remarkHeadingIds() {
 
 /** 보고서 본문에서 목차 항목을 뽑는다. Markdown.tsx와 같은 파서 설정(remark-gfm)을 쓴다. */
 export function getHeadings(markdown: string): TocHeading[] {
-  return assignHeadingIds(unified().use(remarkParse).use(remarkGfm).parse(markdown));
+  return assignHeadingIds(unified().use(remarkParse).use(remarkGfm, REMARK_GFM_OPTIONS).parse(markdown));
 }
