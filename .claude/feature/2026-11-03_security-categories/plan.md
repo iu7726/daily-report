@@ -1,7 +1,7 @@
 # 보안 리포트 분야별 확대 — 기획서
 
-> 상태: **구현 완료, 시험 실행 후 수정 중 (2026-11-03)**. 배포 `v0.0.10`.
-> 남은 것: 2차 시험 실행 결과 확인
+> 상태: **구현·검증 완료 (2026-11-03)**. 배포 `v0.0.10`, 수정분은 루틴 파일만 바뀌어 태그 없음.
+> 남은 것: 11-04 정기 실행 확인
 >
 > 구현 변경점 (계획 대비, 1차 시험 실행 후):
 > - 클라우드 루틴 세션에서 `api.github.com`이 막혀 있다("sessions are bound to their configured repositories"). 루틴은 스스로 OSV 미러로 우회했다. 조사 절차를 처음부터 OSV(`osv-vulnerabilities.storage.googleapis.com/<생태계>/modified_id.csv` + `api.osv.dev/v1/vulns/<ID>`)로 바꿨다. npm·GitHub Actions 둘 다 로컬에서 받아 확인했다.
@@ -80,4 +80,5 @@
 - [ ] 작업 파일·README·사이트 문구 반영, 사이트 테스트·빌드 통과
 - [x] 1차 시험 실행(2026-11-03 11:28 KST, 294초, 34턴): AWS RSS·KEV는 직접 조회, GitHub 보안 DB는 API 차단으로 OSV 미러 사용. 분야 절 5개, 한눈에 보기 표, 절마다 확인 대상 줄, KEV 절(카탈로그 2026.10.30), 확인 명령 절 모두 있음. "~습니다"체. 15KB
 - [x] 같은 날 ChatGPT 리포트의 신규 공지가 모두 들어감: AWS 공지(5건, ChatGPT 4건 + QnABot 재게시), DBHub, SD-JWT, MCP 위장 악성 패키지(4종, ChatGPT 2종). 추가로 `persona-ai-sdk` 악성 패키지, GitLab 최신 패치 기준 정정(CVE-2026-110264), 악성 npm 31건 건수
-- [ ] 아침 버전의 Cursor 확장 변조(P1)가 빠짐 → 수정 후 2차 시험 실행에서 확인
+- [x] 아침 버전의 Cursor 확장 변조(P1)가 빠짐 → 수정 후 2차 시험 실행(11:40 KST, 약 320초)에서 P1로 다시 들어옴. 영향 범위 판단("VS Code Microsoft 마켓플레이스·Claude Code CLI는 해당 없음")과 확인 명령까지 포함
+- [x] 2차 실행: OSV(npm·GitHub Actions)·AWS RSS·KEV 조회 실패 없음. ChatGPT 리포트 항목 모두 포함, 추가로 Linux 커널 TCP RCE(CVE-2026-98432)의 RDS·Aurora OS 패치 제공(11-03), GitLab 최신 패치 기준, `pull_request_target` 기본 차단. level `urgent`, 20KB
