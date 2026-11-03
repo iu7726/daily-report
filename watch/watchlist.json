@@ -13,9 +13,9 @@
       "report": "reports/security-daily-report/2026/11/03.md",
       "created": "2026-11-03",
       "until": "2026-11-06",
-      "status": "open",
-      "done_at": null,
-      "result": null
+      "status": "done",
+      "done_at": "2026-11-04T06:15:00+09:00",
+      "result": "Next.js 16.4.5·15.5.29 공개: High 1건, Medium 6건"
     }
   ],
   "alerted": []
