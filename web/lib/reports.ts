@@ -25,6 +25,8 @@ export type Report = {
   generatedAt: string | null;
   /** 본문 맨 앞 "기준 시각:" 줄의 값 */
   baseTime: string | null;
+  /** 보고서를 쓴 도구. ChatGPT에서 옮겨 온 보고서는 "chatgpt", 루틴이 쓴 보고서는 null */
+  generator: string | null;
   /** 맨 앞 제목 줄과 기준 시각 줄을 뗀 본문 */
   body: string;
 };
@@ -36,6 +38,8 @@ const FRONTMATTER_RE = /^---[ \t]*\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/;
 const TITLE_LINE_RE = /^\[\d{4}-\d{2}-\d{2}[^\]]*\]\s*$/;
 const BASE_TIME_RE = /^기준\s*시각\s*[:：]\s*(.+?)\s*$/;
 const MAX_TAGS = 10;
+/** ChatGPT에서 옮겨 온 보고서 맨 앞의 안내 인용. 사이트는 이 줄 대신 메타 줄에 표시한다. */
+const IMPORT_NOTICE_RE = /^>\s*이 보고서는 ChatGPT 예약 작업으로 작성된 것을 옮겨 왔습니다\.?\s*$/;
 
 // 선택 필드가 틀린 값이면 버리고 기본값을 쓴다(기획서 D5). 파일 전체를 버리는 건 frontmatter가 없거나 YAML이 깨진 경우뿐이다.
 const optionalText = z.string().trim().min(1).optional().catch(undefined);
@@ -49,11 +53,21 @@ const frontmatterSchema = z.object({
   summary: optionalText,
   headline: optionalText,
   description: optionalText,
+  generator: optionalText,
   tags: z
     .array(z.union([z.string(), z.number()]).transform((value) => String(value).trim()))
     .optional()
     .catch(undefined),
 });
+
+/** 본문 첫 줄이 ChatGPT 이전 안내 인용이면 뗀다. 인용은 강조 상자로 보이므로 메타 정보는 본문에서 뺀다. */
+export function stripImportNotice(body: string): string {
+  const lines = body.split(/\r?\n/);
+  if (lines.length === 0 || !IMPORT_NOTICE_RE.test(lines[0].trim())) return body;
+  let i = 1;
+  while (i < lines.length && lines[i].trim() === "") i++;
+  return lines.slice(i).join("\n");
+}
 
 /** 본문 맨 앞의 `[YYYY-MM-DD 제목]` 줄과 `기준 시각:` 줄을 뗀다(기획서 D10). 형식이 다르면 그대로 둔다. */
 export function stripLeadingLines(content: string): { body: string; baseTime: string | null } {
@@ -120,7 +134,9 @@ export function parseReport(
   const title = fm.title ?? getTaskInfo(task)?.title ?? task;
   const summary = fm.summary ?? "";
   const tags = [...new Set((fm.tags ?? []).filter(Boolean))].slice(0, MAX_TAGS);
-  const { body, baseTime } = stripLeadingLines(source.slice(match[0].length));
+  const stripped = stripLeadingLines(source.slice(match[0].length));
+  const generator = fm.generator ?? null;
+  const body = generator === "chatgpt" ? stripImportNotice(stripped.body) : stripped.body;
 
   return {
     report: {
@@ -133,7 +149,8 @@ export function parseReport(
       description: fm.description ?? (summary || `${title} ${date}`),
       tags,
       generatedAt: fm.generated_at ?? null,
-      baseTime,
+      baseTime: stripped.baseTime,
+      generator,
       body,
     },
     warnings,
