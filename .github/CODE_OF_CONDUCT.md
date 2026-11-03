@@ -14,6 +14,6 @@
 
 ## 신고
 
-문제가 되는 글은 그 글의 `···` 메뉴에서 **Report content**로 알려 주세요.
+문제가 되는 글은 그 글의 `···` 메뉴에서 **Report content**로 GitHub에 신고해 주세요. 관리자도 이슈와 댓글을 보고 있다가 이 강령에 따라 조치합니다.
 
 이 강령은 [Contributor Covenant](https://www.contributor-covenant.org/)를 참고해 이 저장소에 맞게 줄여 썼습니다.
