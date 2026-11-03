@@ -15,18 +15,25 @@
 큰 사건만 찾지 말고, 아래 공식 목록을 먼저 **날짜로 훑어** 조사 기간에 새로 올라온 것을 빠짐없이 모은 다음 분야별로 나눠. 목록은 `curl`로 직접 받아 날짜로 걸러.
 
 1. **AWS Security Bulletins**: RSS `https://aws.amazon.com/security/security-bulletins/rss/feed/`. 항목이 날짜순이 아니니 `pubDate`로 걸러. 조사 기간에 올라온 공지는 모두 다뤄. 서비스 자체 공지뿐 아니라 AWS 오픈소스 도구·SDK·MCP 서버 공지도 포함이다.
-2. **GitHub 보안 DB 권고 (npm, GitHub Actions)**: `https://api.github.com/advisories?ecosystem=npm&type=reviewed&published=<UTC 시작일>..<UTC 종료일>&per_page=100`, 같은 조회를 `ecosystem=actions`로 한 번 더. 날짜 조건은 UTC 날짜 단위라, 결과의 `published_at`으로 조사 기간(KST)에 맞게 다시 걸러.
+2. **GitHub 보안 DB 권고 (npm, GitHub Actions)**: GitHub 보안 DB를 그대로 옮겨 오는 OSV 미러로 봐. 루틴 환경에서는 `api.github.com`이 막혀 있다(연결된 저장소 API만 허용).
+   - 목록: `https://osv-vulnerabilities.storage.googleapis.com/npm/modified_id.csv`, `https://osv-vulnerabilities.storage.googleapis.com/GitHub%20Actions/modified_id.csv`. 한 줄이 `수정 시각(UTC),ID`이고 최근 수정순이다. 조사 기간에 수정된 ID만 골라.
+   - 상세: `https://api.osv.dev/v1/vulns/<ID>`. `GHSA-`는 GitHub 검토 권고, `MAL-`은 악성 패키지다. `published`(또는 `database_specific.github_reviewed_at`)가 조사 기간이면 신규, 아니면 기존 권고의 변경이다. 변경은 심각도 상향, 수정 버전 추가, 실제 악용 확인처럼 중요한 것만 다뤄.
+   - Claude Code(`@anthropic-ai/claude-code`), Codex(`@openai/codex`), Gemini CLI(`@google/gemini-cli`)는 npm 패키지라 권고가 여기에 올라온다.
    - 점검 대상 분야의 패키지이거나 널리 쓰이는 패키지(AI·MCP, 인증·토큰, DB, HTTP 관련)는 항목으로 다뤄. 나머지는 "그 밖의 npm 권고 N건"처럼 건수만 적어.
-   - `updated=` 조건으로 기존 권고의 중요한 변경(심각도 상향, 수정 버전 추가, 실제 악용 확인)도 확인해.
-3. **GitHub 보안 DB 악성 패키지 (npm)**: 같은 API에 `type=malware`. 보통 하루 수십 건이라 다 쓰지 마. 전체 건수를 적고, AI·MCP 도구나 점검 대상 생태계(Next.js, NestJS, DB 드라이버, AWS SDK 등)를 사칭하는 것만 골라 다뤄. 비슷한 이름이 여러 개면 묶어서 한 항목으로 써.
+3. **악성 패키지 (npm)**: 2번 목록의 `MAL-` 항목. 보통 하루 수십 건이라 다 쓰지 마. 전체 건수를 적고, AI·MCP 도구나 점검 대상 생태계(Next.js, NestJS, DB 드라이버, AWS SDK 등)를 사칭하는 것만 골라 다뤄. 비슷한 이름이 여러 개면 묶어서 한 항목으로 써.
 4. **CISA KEV**: `https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json` (접속이 안 되면 `https://raw.githubusercontent.com/cisagov/kev-data/develop/known_exploited_vulnerabilities.json`). `catalogVersion`과 조사 기간에 추가된 항목(`dateAdded`)을 확인해. 점검 대상에 해당하면 P1 항목으로 다루고, 해당하지 않아도 'KEV·최근 7일 미해결' 절에 한 줄씩 적어.
-5. 그다음 분야별 공식 출처('우선 참조 출처')와 보도로, 목록에 아직 없는 사건(공급망 공격, 예고된 보안 릴리스, 서비스 장애성 보안 사고)을 찾아.
+5. **목록에 없는 사건 찾기.** 공급망 공격(확장·패키지 변조, CI 토큰 탈취), 예고된 보안 릴리스, 개발 도구 자체의 사고는 위 목록보다 먼저 나오거나 아예 안 올라온다. 웹 검색만으로 끝내지 말고 아래를 직접 열어 봐(WebFetch). `github.com` 페이지는 WebFetch로 열린다.
+   - AI 코딩 도구·IDE 공식 채널: Claude Code 변경 이력, Cursor 변경 이력·보안 공지(포럼 공지 포함), OpenAI Codex 릴리스, GitHub Changelog(Copilot), Gemini CLI 릴리스, VS Code 릴리스 노트
+   - 확장 마켓플레이스 사고: VS Code Marketplace·Open VSX의 악성·변조 확장(Open VSX·Eclipse Foundation 공지, Microsoft 공지). Cursor 같은 VS Code 계열 편집기는 Open VSX를 쓴다.
+   - 공급망 보안 업체의 최근 글 목록: StepSecurity, Socket, Aikido, Wiz 블로그. 1차 자료(벤더 공지, 저장소 권고)로 확인되면 다루고, 아니면 "미확인 보도"로 분리해.
+   - 그 밖의 분야별 공식 출처('우선 참조 출처')
+   - 최근 7일 안에 일어났고 아직 조치가 필요한 P1급 사건은 이전 보고서에 없었다면 신규로 다뤄.
 
-GitHub API는 인증 없이 시간당 60회까지라 위 조회 몇 번이면 충분해. 목록 조회에 실패하면 그 사실을 보고서에 적어. 실패를 "이슈 없음"으로 쓰지 마.
+목록 조회에 실패하면 그 사실을 보고서에 적어. 실패를 "이슈 없음"으로 쓰지 마.
 
 공개일과 DB 등록일이 다르면 둘 다 적어(예: "최초 공개 2026-06-24 · GitHub DB 등록 2026-11-02"). 공개는 오래됐어도 조사 기간에 DB에 처음 올라온 권고는 신규로 다뤄.
 
-분야는 **영향받는 소프트웨어** 기준으로 나눠. 예를 들어 AWS가 낸 공지라도 MCP 서버에 관한 것이면 AI·에이전트에 넣어.
+분야는 **영향받는 소프트웨어** 기준으로 나눠. 예를 들어 AWS가 낸 공지라도 MCP 서버에 관한 것이면 AI·개발 도구에 넣어.
 
 ### 점검 대상
 
@@ -35,7 +42,7 @@ GitHub API는 인증 없이 시간당 60회까지라 위 조회 몇 번이면 �
 | 분야 | 핵심 | 추가 |
 |---|---|---|
 | 클라우드 (AWS) | AWS Security Bulletins 전체, IAM, EC2, S3, CloudFront, ALB, ECR, ECS·EKS, Lambda, RDS·Aurora, ElastiCache, Cognito, Secrets Manager·KMS | API Gateway, SQS·SNS, AWS SDK for JavaScript |
-| AI·에이전트 | Claude Code, OpenAI Codex, Cursor, GitHub Copilot, Gemini CLI, MCP 공식 SDK, Vercel AI SDK, LangChain.js, OpenAI·Anthropic SDK | 많이 쓰는 MCP 서버, 악성 MCP 서버·스킬·확장 유포, LlamaIndex.TS |
+| AI·개발 도구 | Claude Code, OpenAI Codex, Cursor, GitHub Copilot, Gemini CLI, VS Code, 확장 마켓플레이스(VS Code Marketplace, Open VSX), MCP 공식 SDK, Vercel AI SDK, LangChain.js, OpenAI·Anthropic SDK | JetBrains IDE, 많이 쓰는 MCP 서버, 악성 MCP 서버·스킬 유포, LlamaIndex.TS |
 | 런타임·프레임워크 | Node.js(undici 포함), TypeScript, React, Next.js, NestJS | Express, Fastify |
 | 데이터베이스 | PostgreSQL, MySQL·MariaDB, MongoDB, Redis(Valkey 포함) | Elasticsearch·OpenSearch, 벡터 DB(pgvector, Qdrant 등), ORM·드라이버(Prisma, TypeORM, pg, mysql2, ioredis, mongoose) |
 | 공급망·CI/CD·인프라 | npm 생태계 공급망, GitHub Actions, GitLab, Docker | Nginx, OpenSSL, OpenSSH, Kubernetes |
@@ -58,12 +65,12 @@ P1·P2 항목과 P3 한 줄을 합쳐 5~15건이 목표야. 해당 소식이 적
    | 분야 | 상태 | 오늘 다룬 항목 |
    |---|---|---|
    | 클라우드 (AWS) | 이상 없음 | - |
-   | AI·에이전트 | P1 | ① 제품 — 짧은 요약 |
+   | AI·개발 도구 | P1 | ① 제품 — 짧은 요약 |
    | 런타임·프레임워크 | P2 | ② 제품 — 짧은 요약, ③ 제품 — 짧은 요약 |
    | 데이터베이스 | P3 | ④ 제품 — 짧은 요약 |
    | 공급망·CI/CD·인프라 | 이상 없음 | - |
 
-3. **분야별 절**: `## 클라우드 (AWS)`, `## AI·에이전트`, `## 런타임·프레임워크`, `## 데이터베이스`, `## 공급망·CI/CD·인프라` 순서로 다섯 절을 모두 써. 절 제목 앞에 번호를 붙여도 돼.
+3. **분야별 절**: `## 클라우드 (AWS)`, `## AI·개발 도구`, `## 런타임·프레임워크`, `## 데이터베이스`, `## 공급망·CI/CD·인프라` 순서로 다섯 절을 모두 써. 절 제목 앞에 번호를 붙여도 돼.
    - P1·P2 이슈는 아래 '항목 형식'으로, 분야 안에서 우선순위 순으로 써.
    - P3는 절 끝의 `참고` 아래 한 줄 목록으로 써: 제품과 버전, 무엇이 문제인지, 수정 버전, 원문 링크.
    - 절 맨 끝에 `이상 없음으로 확인한 대상: …` 한 줄로, 핵심 대상 중 신규 이슈가 없던 것을 밝혀. 누락과 무소식을 구별하려는 것이다.
@@ -95,9 +102,9 @@ P1·P2 항목과 P3 한 줄을 합쳐 5~15건이 목표야. 해당 소식이 적
 
 | 분야 | 출처 |
 |---|---|
-| 공통 | '조사 절차'의 네 목록(AWS Security Bulletins, GitHub 보안 DB 권고·악성 패키지, CISA KEV), NVD |
+| 공통 | '조사 절차'의 목록(AWS Security Bulletins, OSV의 GitHub 보안 DB 권고·악성 패키지, CISA KEV), NVD |
 | 클라우드 (AWS) | AWS Security Bulletins, AWS 서비스별 보안 공지 |
-| AI·에이전트 | Claude Code 변경 이력·GitHub 보안 권고, OpenAI Codex 릴리스·보안 권고, Cursor 보안 공지·변경 이력, GitHub Changelog(Copilot), Gemini CLI 보안 권고, MCP 공식 SDK 보안 권고, Vercel AI SDK·LangChain.js 릴리스와 GitHub 보안 권고 |
+| AI·개발 도구 | Claude Code 변경 이력·GitHub 보안 권고, OpenAI Codex 릴리스·보안 권고, Cursor 보안 공지·변경 이력, GitHub Changelog(Copilot), Gemini CLI 보안 권고, MCP 공식 SDK 보안 권고, Vercel AI SDK·LangChain.js 릴리스와 GitHub 보안 권고 |
 | 런타임·프레임워크 | Node.js 보안 릴리스, Next.js 보안 블로그, React 블로그, NestJS 릴리스 |
 | 데이터베이스 | PostgreSQL 보안 정보, Oracle Critical Patch Update(MySQL, 1·4·7·10월), MariaDB 보안, MongoDB 보안 경고, Redis·Valkey GitHub 보안 권고, Elastic 보안 공지 |
 | 공급망·CI/CD·인프라 | GitHub 블로그·Changelog, GitLab 보안 릴리스, Docker 보안 공지, nginx 보안 권고, OpenSSL·OpenSSH 보안 공지 |
