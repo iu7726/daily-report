@@ -10,28 +10,37 @@
 
 직전 24시간 동안 새로 공개됐거나 중대한 변화(실제 악용 확인, KEV 등재, 패치 배포 등)가 생긴 보안 이슈를 우선 조사해. 파급력이 큰 경우에는 최근 7일 동안 해결되지 않은 중요 이슈도 포함해.
 
+### 조사 절차
+
+큰 사건만 찾지 말고, 아래 공식 목록을 먼저 **날짜로 훑어** 조사 기간에 새로 올라온 것을 빠짐없이 모은 다음 분야별로 나눠. 목록은 `curl`로 직접 받아 날짜로 걸러.
+
+1. **AWS Security Bulletins**: RSS `https://aws.amazon.com/security/security-bulletins/rss/feed/`. 항목이 날짜순이 아니니 `pubDate`로 걸러. 조사 기간에 올라온 공지는 모두 다뤄. 서비스 자체 공지뿐 아니라 AWS 오픈소스 도구·SDK·MCP 서버 공지도 포함이다.
+2. **GitHub 보안 DB 권고 (npm, GitHub Actions)**: `https://api.github.com/advisories?ecosystem=npm&type=reviewed&published=<UTC 시작일>..<UTC 종료일>&per_page=100`, 같은 조회를 `ecosystem=actions`로 한 번 더. 날짜 조건은 UTC 날짜 단위라, 결과의 `published_at`으로 조사 기간(KST)에 맞게 다시 걸러.
+   - 점검 대상 분야의 패키지이거나 널리 쓰이는 패키지(AI·MCP, 인증·토큰, DB, HTTP 관련)는 항목으로 다뤄. 나머지는 "그 밖의 npm 권고 N건"처럼 건수만 적어.
+   - `updated=` 조건으로 기존 권고의 중요한 변경(심각도 상향, 수정 버전 추가, 실제 악용 확인)도 확인해.
+3. **GitHub 보안 DB 악성 패키지 (npm)**: 같은 API에 `type=malware`. 보통 하루 수십 건이라 다 쓰지 마. 전체 건수를 적고, AI·MCP 도구나 점검 대상 생태계(Next.js, NestJS, DB 드라이버, AWS SDK 등)를 사칭하는 것만 골라 다뤄. 비슷한 이름이 여러 개면 묶어서 한 항목으로 써.
+4. **CISA KEV**: `https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json` (접속이 안 되면 `https://raw.githubusercontent.com/cisagov/kev-data/develop/known_exploited_vulnerabilities.json`). `catalogVersion`과 조사 기간에 추가된 항목(`dateAdded`)을 확인해. 점검 대상에 해당하면 P1 항목으로 다루고, 해당하지 않아도 'KEV·최근 7일 미해결' 절에 한 줄씩 적어.
+5. 그다음 분야별 공식 출처('우선 참조 출처')와 보도로, 목록에 아직 없는 사건(공급망 공격, 예고된 보안 릴리스, 서비스 장애성 보안 사고)을 찾아.
+
+GitHub API는 인증 없이 시간당 60회까지라 위 조회 몇 번이면 충분해. 목록 조회에 실패하면 그 사실을 보고서에 적어. 실패를 "이슈 없음"으로 쓰지 마.
+
+공개일과 DB 등록일이 다르면 둘 다 적어(예: "최초 공개 2026-06-24 · GitHub DB 등록 2026-11-02"). 공개는 오래됐어도 조사 기간에 DB에 처음 올라온 권고는 신규로 다뤄.
+
+분야는 **영향받는 소프트웨어** 기준으로 나눠. 예를 들어 AWS가 낸 공지라도 MCP 서버에 관한 것이면 AI·에이전트에 넣어.
+
 ### 점검 대상
 
-**핵심 기술 (상태표에 항상 한 행씩 포함)**
+다섯 분야로 나눠 점검해. **핵심**은 매일 반드시 확인하고, 신규 이슈가 없으면 그 분야 절 끝의 "이상 없음으로 확인한 대상"에 이름을 남겨. **추가**는 이슈가 있을 때만 다뤄.
 
-- Node.js
-- TypeScript
-- PostgreSQL
-- Redis
-- AWS (EC2, S3, CloudFront, ALB, ECR, IAM 포함)
-- React
-- Next.js
-- Claude Code
-- OpenAI Codex
+| 분야 | 핵심 | 추가 |
+|---|---|---|
+| 클라우드 (AWS) | AWS Security Bulletins 전체, IAM, EC2, S3, CloudFront, ALB, ECR, ECS·EKS, Lambda, RDS·Aurora, ElastiCache, Cognito, Secrets Manager·KMS | API Gateway, SQS·SNS, AWS SDK for JavaScript |
+| AI·에이전트 | Claude Code, OpenAI Codex, Cursor, GitHub Copilot, Gemini CLI, MCP 공식 SDK, Vercel AI SDK, LangChain.js, OpenAI·Anthropic SDK | 많이 쓰는 MCP 서버, 악성 MCP 서버·스킬·확장 유포, LlamaIndex.TS |
+| 런타임·프레임워크 | Node.js(undici 포함), TypeScript, React, Next.js, NestJS | Express, Fastify |
+| 데이터베이스 | PostgreSQL, MySQL·MariaDB, MongoDB, Redis(Valkey 포함) | Elasticsearch·OpenSearch, 벡터 DB(pgvector, Qdrant 등), ORM·드라이버(Prisma, TypeORM, pg, mysql2, ioredis, mongoose) |
+| 공급망·CI/CD·인프라 | npm 생태계 공급망, GitHub Actions, GitLab, Docker | Nginx, OpenSSL, OpenSSH, Kubernetes |
 
-**추가 모니터링 대상**
-
-- NestJS
-- npm 패키지 및 JavaScript/TypeScript 생태계의 소프트웨어 공급망
-- GitLab 및 GitHub Actions CI/CD
-- Docker
-- MySQL, MongoDB
-- Nginx
+언어는 Node.js·TypeScript만 본다. AI 서비스 자체의 데이터 유출이나 모델 공급망 사건은 우리 코드·개발 환경에 직접 닿는 경우(예: 쓰고 있는 SDK의 취약점)가 아니면 다루지 않는다.
 
 ### 우선순위 기준
 
@@ -41,39 +50,57 @@
 
 ### 보고서 구성
 
-1. **긴급 조치 요약**: P1 이슈와 내가 즉시 해야 할 조치를 맨 위에 간결하고 구체적으로 적어. 해당 이슈가 없으면 "즉시 조치가 필요한 이슈 없음"이라고 적어.
-2. **오늘의 핵심 보안 이슈**: 3~7개를 우선순위 순으로 정리해. 항목마다 이 순서로 써.
-   - 제목: `### ① [P1] 제품 — 한 줄 요약`
-   - 무슨 일인지, 누가 영향을 받는지, 공격 조건과 악용 가능성을 2~3문장으로
-   - 값 표: `| 영향 버전 | 수정 버전 | 식별번호 | CVSS | KEV·실제 악용 |`. 확인된 값만 적고 나머지는 "확인 불가"로 적어.
-   - 조치: 짧은 목록 1~3개. 내가 쓰는 버전을 모르니 "○○ 버전을 쓰고 있다면"처럼 조건을 붙이고, 임시 완화책이 있으면 함께 적어.
-   - 원문: 공식 원문 링크와 공개 날짜
-3. **기술 스택별 상태표**: 핵심 기술은 모두 한 행씩 넣고, 추가 모니터링 대상은 이슈가 있을 때만 행을 추가해. 이슈가 없는 항목은 반드시 "확인된 신규 주요 이슈 없음"으로 표시해 누락과 무소식을 구별해. 추가 모니터링 대상 전체에 이슈가 없으면 표 아래에 한 줄로 밝혀.
-4. **미확인 보도·루머**: 사실 확인이 안 된 내용은 이 섹션에 따로 적어.
-5. **후속 확인 등록**: 정해진 시점에 나올 예정이라 오늘 아침에는 확인할 수 없는 것이 있으면 `watch/watchlist.json`에 올려. 3시간마다 도는 후속 확인 루틴(04)이 확인해 나오면 이 리포트에 덧붙이고 알린다.
+P1·P2 항목과 P3 한 줄을 합쳐 5~15건이 목표야. 해당 소식이 적으면 채우지 마. 항목 번호(①②③…)는 보고서 전체에서 이어서 매기고, 1·2절은 이 번호로 항목을 가리켜.
+
+1. **긴급 조치 요약**: P1 이슈와 내가 즉시 해야 할 일을 맨 위에 짧고 구체적으로 적어. 이전 보고에서 다룬 P1이라도 아직 조치 기간이면 한 줄로 다시 상기해. 해당 이슈가 없으면 "즉시 조치가 필요한 이슈 없음"이라고 적어.
+2. **한눈에 보기**: 분야마다 한 행인 표. 상태는 그 분야에서 가장 높은 우선순위(P1/P2/P3)이고, 이슈가 없으면 "이상 없음"이야. 아래는 형식 예시야.
+
+   | 분야 | 상태 | 오늘 다룬 항목 |
+   |---|---|---|
+   | 클라우드 (AWS) | 이상 없음 | - |
+   | AI·에이전트 | P1 | ① 제품 — 짧은 요약 |
+   | 런타임·프레임워크 | P2 | ② 제품 — 짧은 요약, ③ 제품 — 짧은 요약 |
+   | 데이터베이스 | P3 | ④ 제품 — 짧은 요약 |
+   | 공급망·CI/CD·인프라 | 이상 없음 | - |
+
+3. **분야별 절**: `## 클라우드 (AWS)`, `## AI·에이전트`, `## 런타임·프레임워크`, `## 데이터베이스`, `## 공급망·CI/CD·인프라` 순서로 다섯 절을 모두 써. 절 제목 앞에 번호를 붙여도 돼.
+   - P1·P2 이슈는 아래 '항목 형식'으로, 분야 안에서 우선순위 순으로 써.
+   - P3는 절 끝의 `참고` 아래 한 줄 목록으로 써: 제품과 버전, 무엇이 문제인지, 수정 버전, 원문 링크.
+   - 절 맨 끝에 `이상 없음으로 확인한 대상: …` 한 줄로, 핵심 대상 중 신규 이슈가 없던 것을 밝혀. 누락과 무소식을 구별하려는 것이다.
+   - 분야 전체에 이슈가 없으면 "확인된 신규 주요 이슈 없음"과 확인한 대상 한 줄만 써.
+   - 한 사건이 두 분야에 걸치면(예: AI 도구 확장의 공급망 공격) 더 직접적인 분야에 쓰고, 다른 분야 `참고`에는 "① 참고" 한 줄만 남겨.
+   - AWS 공지처럼 서비스 쪽에서 이미 조치되어 사용자가 할 일이 없으면 P3 한 줄로 쓰고 "사용자 조치 불필요"라고 밝혀.
+4. **KEV·최근 7일 미해결**: KEV `catalogVersion`을 밝히고, 조사 기간에 KEV에 추가된 항목과 최근 7일 안에 다룬 P1 중 아직 조치 기간인 것을 표로 적어. `| 식별번호 | 대상 | KEV 등재일 | 해야 할 일 |`. 점검 대상 밖(예: VPN 장비)도 KEV 신규 등재면 한 줄로 넣어.
+5. **오늘 확인할 명령**: 오늘 다룬 항목이 내 환경에 해당하는지 **확인만 하는** 명령을 모아. 설치·수정·삭제하는 명령은 쓰지 마.
+   - npm 패키지는 `npm ls --all <패키지…>`로 한데 묶고, 수정 버전을 옆에 적어.
+   - `npx`로 실행하는 MCP 서버처럼 lockfile에 안 남는 것은 어디를 봐야 하는지(MCP 설정 파일, CI 설치 로그) 함께 적어.
+   - 런타임·이미지 버전 확인(`node -v`, `docker image ls` 등)은 그날 항목과 관련 있을 때만.
+6. **미확인 보도·루머**: 사실 확인이 안 된 내용은 이 절에 따로 적어.
+7. **후속 확인 등록**: 정해진 시점에 나올 예정이라 오늘 아침에는 확인할 수 없는 것이 있으면 `watch/watchlist.json`에 올려. 3시간마다 도는 후속 확인 루틴(04)이 확인해 나오면 이 리포트에 덧붙이고 알린다.
    - 올릴 것: 예고된 보안 릴리스(예: "Next.js 11월 3일 보안 릴리스"), 패치 배포 예고, 공개 대기 중인 권고처럼 **언제 나올지 정해진 것**. 막연한 "추가 정보 대기"는 올리지 마.
    - 형식은 `scheduler/04-security-watch.md`의 '대기 목록 형식'을 따르고, 기한(`until`)은 최대 7일 뒤로 잡아. 이미 같은 항목(`id`)이 열려 있으면 다시 올리지 마. 열린 항목은 최대 5개까지.
    - 올렸다면 리포트의 해당 이슈 항목에 "후속 확인 등록됨"이라고 한 줄 적어.
    - 반대로 열린 항목이 오늘 아침 이미 공개된 것을 확인했다면, 리포트에서 다루고 그 항목의 `status`를 `done`(`done_at`, `result` 포함)으로 바꿔. 후속 확인 루틴이 같은 알림을 다시 보내지 않게 하려는 것이다.
 
-상태표 형식 예시:
+### 항목 형식 (P1·P2)
 
-| 기술 | 상태 | 관련 이슈 | 조치 |
-|---|---|---|---|
-| Node.js | 확인된 신규 주요 이슈 없음 | - | - |
-| Next.js | P1 | CVE-YYYY-NNNNN | 15.x.y 이상으로 업데이트 |
+- 제목: `### ① [P1] 제품 — 한 줄 요약`
+- 무슨 일인지, 공격 조건과 악용 가능성을 2~3문장으로
+- 영향 범위 판단 한 줄: 누가 해당하고 누가 해당하지 않는지 분명히 적어(예: "일반 EC2·S3 사용 환경 전체가 아니라 이 MCP 서버를 쓰는 경우만 해당합니다"). 공식 자료가 밝힌 영향보다 부풀리지 마.
+- 값 표: `| 영향 버전 | 수정 버전 | 식별번호 | CVSS | KEV·실제 악용 |`. 확인된 값만 적고 나머지는 "확인 불가"로 적어.
+- 조치: 짧은 목록 1~3개. 내가 쓰는 버전을 모르니 "○○ 버전을 쓰고 있다면"처럼 조건을 붙이고, 임시 완화책이 있으면 함께 적어.
+- 원문: 공식 원문 링크와 공개 날짜(DB 등록일이 다르면 함께)
 
 ### 우선 참조 출처
 
-- Node.js 공식 보안 권고
-- PostgreSQL 공식 보안 공지
-- Redis 공식 보안 공지
-- AWS Security Bulletins
-- React, Next.js/Vercel 공식 공지
-- Anthropic, OpenAI 공식 공지
-- GitHub Security Advisories
-- CISA KEV
-- NVD
-- 각 프로젝트 공식 릴리스 노트
+| 분야 | 출처 |
+|---|---|
+| 공통 | '조사 절차'의 네 목록(AWS Security Bulletins, GitHub 보안 DB 권고·악성 패키지, CISA KEV), NVD |
+| 클라우드 (AWS) | AWS Security Bulletins, AWS 서비스별 보안 공지 |
+| AI·에이전트 | Claude Code 변경 이력·GitHub 보안 권고, OpenAI Codex 릴리스·보안 권고, Cursor 보안 공지·변경 이력, GitHub Changelog(Copilot), Gemini CLI 보안 권고, MCP 공식 SDK 보안 권고, Vercel AI SDK·LangChain.js 릴리스와 GitHub 보안 권고 |
+| 런타임·프레임워크 | Node.js 보안 릴리스, Next.js 보안 블로그, React 블로그, NestJS 릴리스 |
+| 데이터베이스 | PostgreSQL 보안 정보, Oracle Critical Patch Update(MySQL, 1·4·7·10월), MariaDB 보안, MongoDB 보안 경고, Redis·Valkey GitHub 보안 권고, Elastic 보안 공지 |
+| 공급망·CI/CD·인프라 | GitHub 블로그·Changelog, GitLab 보안 릴리스, Docker 보안 공지, nginx 보안 권고, OpenSSL·OpenSSH 보안 공지 |
+| 보조 | 보안 업체 분석(Socket, Snyk, StepSecurity, Wiz 등). 공급망 사건을 빨리 알려 주지만 1차 자료로 확인되지 않으면 "미확인 보도"로 분리해. |
 
 확인되지 않은 CVE, 버전, 악용 사례를 만들어내지 마.
