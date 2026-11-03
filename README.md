@@ -23,7 +23,7 @@
 
 | 시각 (KST) | 브리핑 | 다루는 것 |
 |---|---|---|
-| 08:25 | **IT 보안 이슈** | 웹 서비스 개발 스택의 CVE·보안 권고, CISA KEV 등재·실제 악용 여부, 패치 버전과 조치 |
+| 08:25 | **IT 보안 이슈** | 클라우드(AWS) · AI 개발 도구·MCP · 런타임·프레임워크 · 데이터베이스 · 공급망·CI/CD 분야별 CVE·보안 권고, CISA KEV 등재·실제 악용 여부, 패치 버전과 조치 |
 | 08:42 | **AI·개발 도구** | OpenAI, Gemini, Claude, MCP 생태계와 AI 개발 도구의 새 소식, 주목할 Agent Skills, 백엔드(Node.js·TypeScript) 적용점 |
 | 08:55 | **S&P500 실적·금리** | 직전 거래일 종가, 기업 실적, Fed 금리, 미 국채, VIX, 원/달러 환율, 이번 주 일정 |
 
@@ -122,6 +122,7 @@ daily-report/
 | 루틴 다듬기·보안 후속 확인 | [`2026-11-03_routine-tuning/plan.md`](.claude/feature/2026-11-03_routine-tuning/plan.md) |
 | 보고서 목차·날짜 목록 | [`2026-11-03_report-toc/plan.md`](.claude/feature/2026-11-03_report-toc/plan.md) |
 | 방문 통계 | [`2026-11-03_web-analytics/plan.md`](.claude/feature/2026-11-03_web-analytics/plan.md) |
+| 보안 리포트 분야별 확대 | [`2026-11-03_security-categories/plan.md`](.claude/feature/2026-11-03_security-categories/plan.md) |
 
 기획서에는 결정 사항과 그 이유, 예외 케이스 목록, 계획과 달라진 점, 실제로 돌려 본 검증 결과가 들어 있습니다.
 

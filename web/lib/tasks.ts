@@ -12,7 +12,7 @@ export const TASKS: readonly TaskInfo[] = [
     title: "IT 보안 이슈 데일리 리포트",
     shortTitle: "IT 보안",
     description:
-      "웹 서비스 개발 스택(런타임, 프레임워크, 데이터베이스, 클라우드, CI/CD)의 보안 권고와 CVE, 실제 악용 여부를 매일 정리합니다."
+      "클라우드(AWS), AI 개발 도구·MCP, 런타임·프레임워크, 데이터베이스, 공급망·CI/CD 분야별로 보안 권고와 CVE, 실제 악용 여부를 매일 정리합니다."
   },
   {
     id: "ai-dev-briefing",
