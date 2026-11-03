@@ -105,10 +105,15 @@ body {
   white-space: nowrap;
 }
 
+/* 목차 링크로 이동할 때 상단 헤더(sticky)에 소제목이 가리지 않게 한다. */
+.report-prose :is(h2, h3, h4) {
+  scroll-margin-top: 6rem;
+}
+
 /* 인용 = 강조 상자. 보고서는 항목의 실무 영향을 인용으로 쓴다(scheduler/CLAUDE.md '글쓰기'). */
 .report-prose blockquote {
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--foreground);
   background: var(--surface);
   border-inline-start: 3px solid var(--foreground);

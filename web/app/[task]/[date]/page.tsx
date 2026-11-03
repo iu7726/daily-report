@@ -2,14 +2,18 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LevelBadge } from "@/components/LevelBadge";
 import { Markdown } from "@/components/Markdown";
+import { TableOfContents, TableOfContentsDisclosure } from "@/components/TableOfContents";
 import { TagChip } from "@/components/TagChip";
+import { TaskDateNav } from "@/components/TaskDateNav";
 import { formatDateKo, formatDateShortKo } from "@/lib/date";
+import { getHeadings } from "@/lib/headings";
 import {
   type Report,
   getAdjacentInTask,
   getAllReports,
   getReport,
   getReportsByDate,
+  getReportsByTask,
   getTaskTitle,
 } from "@/lib/reports";
 import { jsonLd, pageMetadata } from "@/lib/seo";
@@ -62,6 +66,9 @@ export default async function ReportPage({ params }: PageProps<"/[task]/[date]">
   const { prev, next } = getAdjacentInTask(task, date);
   const sameDay = getReportsByDate(date).filter((other) => other.task !== task);
   const url = absoluteUrl(`/${task}/${date}`);
+  const headings = getHeadings(report.body);
+  const showToc = headings.length >= 2;
+  const shortTitle = getTaskInfo(task)?.shortTitle ?? taskTitle;
 
   const articleLd = {
     "@context": "https://schema.org",
@@ -81,103 +88,126 @@ export default async function ReportPage({ params }: PageProps<"/[task]/[date]">
   };
 
   return (
-    <article className="mx-auto flex w-full max-w-3xl flex-col gap-10">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(articleLd) }} />
-
-      <header className="flex flex-col gap-5">
-        <nav aria-label="위치" className="flex flex-wrap items-center gap-2 text-xs text-muted">
-          <Link href={`/${task}`} className="font-medium hover:text-foreground">
-            {getTaskInfo(task)?.shortTitle ?? taskTitle}
-          </Link>
-          <span aria-hidden className="text-subtle">
-            /
-          </span>
-          <Link href={`/day/${date}`} className="font-mono hover:text-foreground">
-            {date}
-          </Link>
-        </nav>
-
-        <h1 className="text-2xl font-semibold leading-tight tracking-tight sm:text-[2rem]">{report.headline}</h1>
-
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted">
-          <LevelBadge level={report.level} />
-          <span>{formatDateKo(date)}</span>
-          {report.baseTime && (
-            <span className="inline-flex items-center gap-3">
-              <span aria-hidden className="text-subtle">
-                ·
-              </span>
-              <span>
-                기준 시각 <span className="font-mono">{report.baseTime}</span>
-              </span>
-            </span>
-          )}
-          {report.generator === "chatgpt" && (
-            <span className="inline-flex items-center gap-3">
-              <span aria-hidden className="text-subtle">
-                ·
-              </span>
-              <span>ChatGPT에서 옮겨 온 보고서</span>
-            </span>
-          )}
+    // 1280px 이상: 날짜 목록 | 본문 | 목차, 1024px 이상: 본문 | 목차, 그보다 좁으면 본문만(기획서 D4)
+    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_13rem] lg:gap-10 xl:grid-cols-[10rem_minmax(0,1fr)_13rem]">
+      <aside className="hidden xl:block">
+        <div className="sticky top-20 max-h-[calc(100dvh-6rem)] overflow-y-auto pb-6">
+          <TaskDateNav task={task} taskTitle={shortTitle} reports={getReportsByTask(task)} current={date} />
         </div>
+      </aside>
 
-        {report.summary && (
-          <p className="rounded-xl border border-line bg-surface p-4 text-[15px] leading-relaxed sm:p-5">
-            <span className="mr-2 text-xs font-semibold text-muted">결론</span>
-            {report.summary}
-          </p>
-        )}
+      <article className="mx-auto flex w-full min-w-0 max-w-3xl flex-col gap-10 lg:mx-0 lg:max-w-none">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(articleLd) }} />
 
-        {report.tags.length > 0 && (
-          <ul aria-label="태그" className="flex flex-wrap gap-1.5">
-            {report.tags.map((tag) => {
-              const slug = slugifyTag(tag);
-              return (
-                <li key={tag}>
-                  {slug ? (
-                    <TagChip slug={slug} name={tag} />
-                  ) : (
-                    <span className="rounded-md border border-line px-2 py-0.5 font-mono text-[11px] text-muted">{tag}</span>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </header>
+        <header className="flex flex-col gap-5">
+          <nav aria-label="위치" className="flex flex-wrap items-center gap-2 text-xs text-muted">
+            <Link href={`/${task}`} className="font-medium hover:text-foreground">
+              {shortTitle}
+            </Link>
+            <span aria-hidden className="text-subtle">
+              /
+            </span>
+            <Link href={`/day/${date}`} className="font-mono hover:text-foreground">
+              {date}
+            </Link>
+          </nav>
 
-      <Markdown>{report.body}</Markdown>
+          <h1 className="text-2xl font-semibold leading-tight tracking-tight sm:text-[2rem]">{report.headline}</h1>
 
-      <footer className="flex flex-col gap-8 border-t border-line pt-8">
-        <nav aria-label="같은 작업의 다른 날짜" className="grid gap-3 sm:grid-cols-2">
-          {prev ? <AdjacentLink report={prev} direction="prev" /> : <span />}
-          {next && <AdjacentLink report={next} direction="next" />}
-        </nav>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted">
+            <LevelBadge level={report.level} />
+            <span>{formatDateKo(date)}</span>
+            {report.baseTime && (
+              <span className="inline-flex items-center gap-3">
+                <span aria-hidden className="text-subtle">
+                  ·
+                </span>
+                <span>
+                  기준 시각 <span className="font-mono">{report.baseTime}</span>
+                </span>
+              </span>
+            )}
+            {report.generator === "chatgpt" && (
+              <span className="inline-flex items-center gap-3">
+                <span aria-hidden className="text-subtle">
+                  ·
+                </span>
+                <span>ChatGPT에서 옮겨 온 보고서</span>
+              </span>
+            )}
+          </div>
 
-        {sameDay.length > 0 && (
-          <section className="flex flex-col gap-3" aria-labelledby="same-day-heading">
-            <h2 id="same-day-heading" className="text-xs font-semibold text-muted">
-              같은 날 다른 브리핑
-            </h2>
-            <ul className="flex flex-col gap-2">
-              {sameDay.map((other) => (
-                <li key={other.task}>
-                  <Link
-                    href={`/${other.task}/${other.date}`}
-                    className="flex items-center gap-3 text-sm hover:underline hover:underline-offset-4"
-                  >
-                    <LevelBadge level={other.level} />
-                    <span className="text-muted">{getTaskInfo(other.task)?.shortTitle ?? other.title}</span>
-                    <span className="truncate">{other.headline}</span>
-                  </Link>
-                </li>
-              ))}
+          {report.summary && (
+            <p className="rounded-xl border border-line bg-surface p-4 text-[15px] leading-relaxed sm:p-5">
+              <span className="mr-2 text-xs font-semibold text-muted">결론</span>
+              {report.summary}
+            </p>
+          )}
+
+          {report.tags.length > 0 && (
+            <ul aria-label="태그" className="flex flex-wrap gap-1.5">
+              {report.tags.map((tag) => {
+                const slug = slugifyTag(tag);
+                return (
+                  <li key={tag}>
+                    {slug ? (
+                      <TagChip slug={slug} name={tag} />
+                    ) : (
+                      <span className="rounded-md border border-line px-2 py-0.5 font-mono text-[11px] text-muted">{tag}</span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
-          </section>
+          )}
+
+          {showToc && (
+            <div className="lg:hidden">
+              <TableOfContentsDisclosure headings={headings} />
+            </div>
+          )}
+        </header>
+
+        <Markdown>{report.body}</Markdown>
+
+        <footer className="flex flex-col gap-8 border-t border-line pt-8">
+          <nav aria-label="같은 작업의 다른 날짜" className="grid gap-3 sm:grid-cols-2">
+            {prev ? <AdjacentLink report={prev} direction="prev" /> : <span />}
+            {next && <AdjacentLink report={next} direction="next" />}
+          </nav>
+
+          {sameDay.length > 0 && (
+            <section className="flex flex-col gap-3" aria-labelledby="same-day-heading">
+              <h2 id="same-day-heading" className="text-xs font-semibold text-muted">
+                같은 날 다른 브리핑
+              </h2>
+              <ul className="flex flex-col gap-2">
+                {sameDay.map((other) => (
+                  <li key={other.task}>
+                    <Link
+                      href={`/${other.task}/${other.date}`}
+                      className="flex items-center gap-3 text-sm hover:underline hover:underline-offset-4"
+                    >
+                      <LevelBadge level={other.level} />
+                      <span className="text-muted">{getTaskInfo(other.task)?.shortTitle ?? other.title}</span>
+                      <span className="truncate">{other.headline}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </footer>
+      </article>
+
+      <aside className="hidden lg:block">
+        {showToc && (
+          <div className="sticky top-20 max-h-[calc(100dvh-6rem)] overflow-y-auto pb-6">
+            <TableOfContents headings={headings} />
+          </div>
         )}
-      </footer>
-    </article>
+      </aside>
+    </div>
   );
 }
 

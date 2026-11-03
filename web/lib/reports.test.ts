@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { loadReports, parseReport, stripImportNotice, stripLeadingLines } from "./reports";
+import { loadReports, parseReport, pickAround, stripImportNotice, stripLeadingLines } from "./reports";
 
 const FIXTURES = path.join(__dirname, "__fixtures__", "reports");
 
@@ -177,5 +177,25 @@ describe("ChatGPT 이전 안내 (generator: chatgpt)", () => {
   it("본문 중간의 같은 문장이나 다른 인용은 건드리지 않는다", () => {
     expect(stripImportNotice("> 강조 문장\n\n본문")).toBe("> 강조 문장\n\n본문");
     expect(stripImportNotice(`본문\n\n${NOTICE}`)).toBe(`본문\n\n${NOTICE}`);
+  });
+});
+
+describe("pickAround (TOC D5, T6)", () => {
+  // 최신순 10개: 10 → 1
+  const list = Array.from({ length: 10 }, (_, i) => ({ date: `2026-11-${String(10 - i).padStart(2, "0")}` }));
+  const days = (items: { date: string }[]) => items.map((item) => Number(item.date.slice(8)));
+
+  it("가운데에 두고 앞뒤로 나눈다", () => {
+    expect(days(pickAround(list, "2026-11-05", 5))).toEqual([7, 6, 5, 4, 3]);
+  });
+
+  it("최신·가장 오래된 쪽에서는 반대쪽으로 채운다", () => {
+    expect(days(pickAround(list, "2026-11-10", 5))).toEqual([10, 9, 8, 7, 6]);
+    expect(days(pickAround(list, "2026-11-01", 5))).toEqual([5, 4, 3, 2, 1]);
+  });
+
+  it("목록이 짧으면 있는 만큼만, 없는 날짜면 최신부터", () => {
+    expect(pickAround(list, "2026-11-05", 15)).toHaveLength(10);
+    expect(days(pickAround(list, "2026-12-01", 3))).toEqual([10, 9, 8]);
   });
 });

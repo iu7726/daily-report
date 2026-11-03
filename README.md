@@ -15,7 +15,7 @@
 ![Vercel](https://img.shields.io/badge/Vercel-static-000?logo=vercel)
 
 <img src="docs/images/home-light.png" alt="홈 화면: 최신 브리핑 카드 3개와 월 캘린더" width="49%" />
-<img src="docs/images/report-dark.png" alt="보고서 상세 화면(다크 모드)" width="49%" />
+<img src="docs/images/report-dark.png" alt="보고서 상세 화면(다크 모드): 왼쪽 날짜 목록, 가운데 본문, 오른쪽 목차" width="49%" />
 
 </div>
 
@@ -65,6 +65,7 @@ flowchart LR
 - Pretendard + Geist Mono, 단어 단위 줄바꿈(`keep-all`), 시스템 설정을 따르는 다크 모드
 - 날짜는 KST 문자열로만 다뤄 UTC 빌드 서버에서 하루가 밀리지 않습니다.
 - AI가 쓴 본문은 원시 HTML을 렌더링하지 않습니다.
+- 넓은 화면에서는 문서 사이트처럼 왼쪽에 같은 보고서의 날짜 목록, 오른쪽에 소제목 목차가 붙고, 지금 읽는 절이 목차에 표시됩니다. 휴대폰에서는 목차가 접힌 상자로 들어갑니다.
 
 ## 🔐 내 프로젝트 보안 점검 (Claude Code 스킬)
 
@@ -117,6 +118,8 @@ daily-report/
 |---|---|
 | 보고서 사이트 | [`2026-11-02_report-site/plan.md`](.claude/feature/2026-11-02_report-site/plan.md) |
 | 태그별 페이지 | [`2026-11-02_tag-pages/plan.md`](.claude/feature/2026-11-02_tag-pages/plan.md) |
+| 루틴 다듬기·보안 후속 확인 | [`2026-11-03_routine-tuning/plan.md`](.claude/feature/2026-11-03_routine-tuning/plan.md) |
+| 보고서 목차·날짜 목록 | [`2026-11-03_report-toc/plan.md`](.claude/feature/2026-11-03_report-toc/plan.md) |
 
 기획서에는 결정 사항과 그 이유, 예외 케이스 목록, 계획과 달라진 점, 실제로 돌려 본 검증 결과가 들어 있습니다.
 
