@@ -58,6 +58,7 @@ flowchart LR
 - 루틴이 보고서마다 검색용 제목(`headline`), 설명(`description`), 태그(`tags`)를 함께 뽑습니다.
 - 그 값으로 페이지 메타 태그, 공유 이미지(OG), JSON-LD, `sitemap.xml`, RSS를 자동으로 만듭니다.
 - 태그별 페이지(`/tags/nodejs`)가 보고서를 주제별로 묶습니다. 보고서가 1건뿐인 태그는 `noindex`로 빈약한 페이지가 색인되는 것을 막습니다.
+- 유입은 GA 없이 봅니다. 검색어·노출·순위는 구글 서치 콘솔과 네이버 서치어드바이저, 방문자는 쿠키 없는 Vercel Web Analytics로 집계합니다.
 
 <img src="docs/images/og-sample.png" alt="보고서 공유 이미지 예시" width="560" />
 
@@ -120,6 +121,7 @@ daily-report/
 | 태그별 페이지 | [`2026-11-02_tag-pages/plan.md`](.claude/feature/2026-11-02_tag-pages/plan.md) |
 | 루틴 다듬기·보안 후속 확인 | [`2026-11-03_routine-tuning/plan.md`](.claude/feature/2026-11-03_routine-tuning/plan.md) |
 | 보고서 목차·날짜 목록 | [`2026-11-03_report-toc/plan.md`](.claude/feature/2026-11-03_report-toc/plan.md) |
+| 방문 통계 | [`2026-11-03_web-analytics/plan.md`](.claude/feature/2026-11-03_web-analytics/plan.md) |
 
 기획서에는 결정 사항과 그 이유, 예외 케이스 목록, 계획과 달라진 점, 실제로 돌려 본 검증 결과가 들어 있습니다.
 
