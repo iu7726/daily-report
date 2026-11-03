@@ -55,7 +55,7 @@ python3 <스킬 폴더>/collect.py reports            # 최근 3건, 더 보려�
 
 리포트에서 **로컬에서 확인할 수 있는 대상**과 취약 범위를 뽑아 `이름:범위` 규칙으로 만든다.
 
-- 대상: npm 패키지(`next`, `undici`, `react-server-dom-webpack` …), Node 런타임(`node`), 컨테이너 이미지(`nginx`, `postgres`, `redis` …)
+- 대상: npm 패키지(`next`, `undici`, `react-server-dom-webpack`, AI SDK·MCP(`ai`, `langchain`, `@modelcontextprotocol/sdk`), DB 드라이버·ORM(`pg`, `mysql2`, `ioredis`, `mongoose`, `prisma`) …), Node 런타임(`node`), 컨테이너 이미지(`nginx`, `postgres`, `mysql`, `mongo`, `redis` …)
 - 범위는 "수정 버전 미만"을 비교식으로 쓴다. 메이저 라인이 여러 개면 `||`로 잇는다.
   - "16.x는 16.4.1 이상, 13~15.x는 15.5.28 이상" → `next:>=16.0.0 <16.4.1 || >=13.0.0 <15.5.28`
   - "Node 26.12.1 / 24.22.1 / 22.23.4로 업데이트" → `node:>=26.0.0 <26.12.1 || >=24.0.0 <24.22.1 || >=22.0.0 <22.23.4 || <22.0.0`
