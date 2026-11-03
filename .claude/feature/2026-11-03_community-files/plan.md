@@ -1,11 +1,12 @@
 # 커뮤니티 문서 (라이선스·보안 정책·템플릿) — 기획서
 
 > 상태: **구현·검증 완료 (2026-11-03)**. `web/` 변경 없어 태그 없음
-> 남은 것: 커밋·병합, 저장소 설정 2가지(사용자), 병합 후 `/community` 점검표 확인
+> 남은 것: 이슈 템플릿 선택 화면 확인(로그인 필요, 사용자)
 >
 > 구현 변경점 (계획 대비):
 > - `reports/LICENSE` 맨 위에 적용 범위, 출처 표기 예, 인용 원문의 권리, 무보증을 한국어로 적고 그 아래에 CC BY 4.0 전문을 붙였다.
 > - README 기획서 표에 빠져 있던 물결표 취소선 기획서도 함께 넣었다.
+> - 저장소 설정의 Reported content(신고를 관리자가 받기)는 조직 소유 공개 저장소에만 있다(GitHub 문서 확인). 개인 저장소에서는 Report content 신고가 GitHub로 가므로, 행동 강령 문구를 "GitHub에 신고"로 고쳤다.
 
 ## 0. TL;DR
 
@@ -31,7 +32,7 @@ GitHub 커뮤니티 점검표(`/community`)가 28%(README, 소개 문구만)였�
 - **D4. 루트 `LICENSE`는 MIT 원문 그대로**. 문구를 덧붙이면 GitHub가 라이선스를 알아보지 못한다. 보고서 예외는 `reports/LICENSE`와 README에 적는다.
 - **D5. 연락 창구는 GitHub 기능만 쓴다.** 메일 주소를 공개하지 않는다.
   - 보안 문제: GitHub 비공개 취약점 신고
-  - 행동 강령 위반: 글의 Report content(신고)
+  - 행동 강령 위반: 글의 Report content(GitHub에 신고). 관리자는 이슈·댓글 알림을 보고 직접 조치한다.
   - 보고서 오류·사이트 오류·제안: 이슈 템플릿
 - **D6. 보안 정책 대상에 루틴 프롬프트 인젝션을 넣는다.** 루틴이 웹 문서를 읽고 저장소에 커밋하므로, 조사한 문서의 문구로 루틴이 엉뚱한 내용을 쓰거나 파일을 바꾸게 만드는 경로가 이 저장소의 실제 공격면이다.
 - **D7. 행동 강령은 Contributor Covenant를 참고해 짧게 쓴다.** 원문 번역은 비공개 연락처(메일)를 요구해서 D5와 맞지 않는다.
@@ -62,10 +63,11 @@ README(구조, 제보·기여, 라이선스 절, 기획서 표)와 루트 `CLAUD
 1. 위 파일 작성, README·CLAUDE.md 반영
 2. 이슈 템플릿 YAML 문법 확인, 사이트 테스트·빌드(보고서 목록 영향 없음)
 3. 커밋·병합(사용자 요청 시). `web/` 변경이 없어 태그 없음
-4. 저장소 설정(사용자): Settings → Security의 Private vulnerability reporting 켜기, Settings → Moderation options의 Reported content 받기
+4. 저장소 설정(사용자): Settings → Advanced Security의 Private vulnerability reporting 켜기
 
 ## 7. 검증
 
 - [x] 이슈 템플릿 YAML 4개 파싱(Ruby YAML): config, 보고서 정정 요청(항목 5), 사이트 오류(3), 제안(2)
 - [x] `npm test` 57/57, `npm run build` 정적 페이지 226개, `reports/LICENSE`로 인한 경고 없음
-- [ ] 병합 후 `/community` 점검표 확인
+- [x] 병합 후 커뮤니티 API(`/repos/iu7726/daily-report/community/profile`): health 28 → 100. 라이선스 MIT로 인식, 행동 강령·기여 안내·PR 템플릿 ○. 이슈 템플릿은 API 값이 ×로 나와 선택 화면(`/issues/new/choose`, 로그인 필요)으로 확인한다.
+- [x] 비공개 취약점 신고: 사용자가 켬, API `private-vulnerability-reporting` → `enabled: true`, Security 탭에 "Report a vulnerability" 표시
