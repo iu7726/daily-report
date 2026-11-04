@@ -1,7 +1,7 @@
 # 방문 통계 (Vercel Web Analytics) — 기획서
 
 > 상태: **구현 완료 (2026-11-03)**. Vercel Analytics 켬(사용자), 배포 `v0.0.9`.
-> 남은 것: 배포 후 수집 확인
+> 남은 것: 없음
 
 ## 0. TL;DR
 
@@ -36,4 +36,4 @@ GA 없이 방문 통계를 본다. 검색어·노출·순위는 이미 등록한
 ## 7. 검증
 
 - [x] `npx tsc --noEmit`, `npm test` 55/55, `npm run lint`, `npm run build` 통과. 수집 스크립트(`/_vercel/insights`)가 클라이언트 번들에 포함되고, 동적으로 바뀐 라우트 0개(모두 정적 생성 유지) (2026-11-03)
-- [ ] 배포 후 `/_vercel/insights/script.js` 200, 대시보드에 조회수 표시
+- [x] 배포 후 `/_vercel/insights/script.js` 200(2026-11-03), 대시보드에 방문자·유입 경로·기기가 집계됨(사용자 확인 11-03 ~ 11-04, 방문자 15명)
