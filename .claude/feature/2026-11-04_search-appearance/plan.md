@@ -56,6 +56,6 @@
 ## 7. 검증
 
 - [x] `npm test` 57/57, `npx tsc --noEmit`, `npm run lint`, `npm run build`(`SITE_URL`을 운영 주소로 준 빌드). 빌드 결과 홈 HTML에 `rel="icon" sizes="192x192"`, `rel="apple-touch-icon" sizes="180x180"`, `"alternateName":["daily-report-ashy-nine.vercel.app"]`. 아이콘 PNG 192×192·180×180을 열어 그림 확인. `robots.txt`는 전체 허용
-- [ ] 운영 홈 HTML: `rel="icon" sizes="192x192"`, `rel="apple-touch-icon" sizes="180x180"`, 구조화 데이터 `alternateName`
-- [ ] 아이콘 주소 두 개가 200 PNG이고 `robots.txt`에 막히지 않음
+- [x] 운영 홈 HTML(10:31 KST, push 후 약 1분): `rel="icon" sizes="192x192"`, `rel="apple-touch-icon" sizes="180x180"`, 구조화 데이터 `alternateName`
+- [x] 아이콘 주소 두 개가 200 `image/png`(3.6KB, 2.4KB), Googlebot-Image 사용자 에이전트로도 200, `robots.txt` 전체 허용
 - [ ] (며칠 ~ 몇 주 뒤) 구글 검색 결과의 이름·아이콘
