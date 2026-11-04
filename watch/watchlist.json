@@ -16,6 +16,22 @@
       "status": "done",
       "done_at": "2026-11-04T06:15:00+09:00",
       "result": "Next.js 16.4.5·15.5.29 공개: High 1건, Medium 6건"
+    },
+    {
+      "id": "nodejs-security-release-2026-11",
+      "title": "Node.js 11월 11일 보안 릴리스",
+      "check": "Node.js 블로그에 2026년 11월 11일 보안 릴리스(22.x·24.x·26.x, 최고 심각도 High)의 수정 버전과 CVE가 공개됨",
+      "sources": [
+        "https://nodejs.org/en/blog/vulnerability/november-2026-security-releases",
+        "https://nodejs.org/en/blog/vulnerability",
+        "https://github.com/nodejs/node/releases"
+      ],
+      "report": "reports/security-daily-report/2026/11/05.md",
+      "created": "2026-11-05",
+      "until": "2026-11-12",
+      "status": "open",
+      "done_at": null,
+      "result": null
     }
   ],
   "alerted": []
