@@ -1,28 +1,10 @@
 import { ImageResponse } from "next/og";
+import { BrandIcon } from "@/lib/brand-icon";
 
-export const size = { width: 32, height: 32 };
+// 구글 검색 결과의 사이트 아이콘은 48×48보다 큰 것을 권한다. 브라우저 탭에서는 알아서 줄여 쓴다.
+export const size = { width: 192, height: 192 };
 export const contentType = "image/png";
 
 export default function Icon() {
-  return new ImageResponse(
-    (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
-          height: "100%",
-          borderRadius: 7,
-          background: "#0a0a0a",
-          color: "#ededed",
-          fontSize: 21,
-          fontWeight: 700,
-        }}
-      >
-        D
-      </div>
-    ),
-    size,
-  );
+  return new ImageResponse(<BrandIcon size={size.width} />, size);
 }
