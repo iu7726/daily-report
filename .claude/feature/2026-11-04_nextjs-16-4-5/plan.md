@@ -28,4 +28,4 @@
 - [x] `npm install --save-exact next@16.4.5 eslint-config-next@16.4.5`: lockfile 변경 50줄, 다른 의존성은 그대로
 - [x] `npm test` 57/57, `npx tsc --noEmit`, `npm run lint`, `npm run build`(정적 페이지 241개) 통과
 - [x] `npm audit --omit=dev`: 운영 의존성 취약점 0건. 개발 도구(ESLint·Tailwind 쪽 `minimatch`, `postcss-selector-parser`)의 Moderate 18건은 업그레이드 전부터 있었고 빌드할 때만 쓰여 이번 범위에서 다루지 않는다. 기준 시각에 OSV(GitHub 보안 DB)에는 이번 Next.js 권고가 아직 없어 `npm audit`이 16.4.3을 잡지 못했다.
-- [ ] 배포 후 사이트 확인
+- [x] 배포 후 사이트 확인(10:09 KST, push 후 약 2분): 클라이언트 번들의 Next.js 버전이 16.4.3 → 16.4.5. 홈, 11-04 보고서 3개, 태그, RSS 모두 200

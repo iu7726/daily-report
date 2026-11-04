@@ -1,7 +1,7 @@
 # 보안 리포트 분야별 확대 — 기획서
 
 > 상태: **구현·검증 완료 (2026-11-03)**. 배포 `v0.0.10`, 수정분은 루틴 파일만 바뀌어 태그 없음.
-> 남은 것: 11-04 정기 실행 확인
+> 남은 것: 없음. 11-04 정기 실행(08:25 시작, 08:30 커밋, 13KB)에서 분야 절 5개를 포함한 11개 절, 한눈에 보기 표, KEV 표, 확인 명령이 모두 나왔고 조회 실패 목록이 없었다.
 >
 > 구현 변경점 (계획 대비, 1차 시험 실행 후):
 > - 클라우드 루틴 세션에서 `api.github.com`이 막혀 있다("sessions are bound to their configured repositories"). 루틴은 스스로 OSV 미러로 우회했다. 조사 절차를 처음부터 OSV(`osv-vulnerabilities.storage.googleapis.com/<생태계>/modified_id.csv` + `api.osv.dev/v1/vulns/<ID>`)로 바꿨다. npm·GitHub Actions 둘 다 로컬에서 받아 확인했다.
