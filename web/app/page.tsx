@@ -27,12 +27,15 @@ export default function HomePage() {
   const latestDate = dates[0];
   const latest = latestDate ? getReportsByDate(latestDate) : [];
 
+  const siteUrl = getSiteUrl();
   const websiteLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: SITE_NAME,
+    // 구글이 name을 쓰지 않을 때 상위 도메인 이름(Vercel) 대신 이 사이트의 서브도메인을 쓰게 한다(구글 권장 대비책).
+    alternateName: [new URL(siteUrl).host],
     description: SITE_DESCRIPTION,
-    url: getSiteUrl(),
+    url: siteUrl,
     inLanguage: "ko-KR",
   };
 
