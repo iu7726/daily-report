@@ -34,5 +34,21 @@
       "result": null
     }
   ],
-  "alerted": []
+  "alerted": [
+    {
+      "id": "CVE-2026-119923",
+      "title": "Aurora PostgreSQL Babelfish 인증 없는 RCE",
+      "at": "2026-11-07T06:15:00+09:00"
+    },
+    {
+      "id": "CVE-2026-119924",
+      "title": "Aurora PostgreSQL Babelfish TDS RPC 메모리 읽기",
+      "at": "2026-11-07T06:15:00+09:00"
+    },
+    {
+      "id": "2026-166-AWS",
+      "title": "Babelfish for Aurora PostgreSQL",
+      "at": "2026-11-07T06:15:00+09:00"
+    }
+  ]
 }
