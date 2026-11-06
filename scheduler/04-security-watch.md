@@ -25,7 +25,7 @@
 
 ### B. 긴급 감시
 
-조사 기간은 실행 시각부터 거슬러 올라간 **3시간 30분**이다(회차 간격 3시간에 시작 지연 여유 30분). 아래 목록을 `curl`로 받아 조사 기간에 새로 올라온 것만 봐.
+조사 기간은 실행 시각부터 거슬러 올라간 **3시간 30분**이다(회차 간격 3시간에 시작 지연 여유 30분). 아래 목록을 `curl -sL --max-time 30 -w '%{http_code} %{size_download}\n'`로 받아 조사 기간에 새로 올라온 것만 봐. 리다이렉트를 따라가고(`-L`), 응답 코드가 200이 아니거나 본문이 안내 페이지 수준이면 조회 실패로 본다.
 
 1. **CISA KEV**: `https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json` (안 되면 `https://raw.githubusercontent.com/cisagov/kev-data/develop/known_exploited_vulnerabilities.json`). `dateAdded`는 날짜 단위라 최근 2일에 추가된 항목을 보고, 아래 '중복 확인'으로 이미 다룬 것을 거른다.
    - 알릴 것: `vendorProject`·`product`가 핵심 제품(아래 표)에 해당하는 항목
@@ -40,6 +40,15 @@
 4. **AWS Security Bulletins**: `https://aws.amazon.com/security/security-bulletins/rss/feed/`. 항목이 날짜순이 아니니 `pubDate`로 걸러.
    - 알릴 것: 핵심 AWS 서비스(아래 표)에 영향이 있고 고객이 조치해야 하는 공지, 또는 실제 악용이 확인됐다고 밝힌 공지
    - AWS 오픈소스 도구·SDK·샘플 공지는 알리지 마(아침 리포트가 다룬다).
+5. **NVD (서버·DB·인프라 CVE)**: OpenSSH, MariaDB처럼 npm 밖 제품의 CVE는 1 ~ 4번에 안 올라온다. 저장소 루트에서 실행해.
+
+   ```bash
+   python3 -I scheduler/scripts/nvd_scan.py --hours 3.5
+   ```
+
+   - 알릴 것: '대상 제품'에서 `"alert": true`인 CVE. CVSS 9.0 이상이거나, 8.0 이상이면서 네트워크로 인증 없이 공격할 수 있는 것(`AV:N`, `PR:N`)이다.
+   - 영향 제품이 "확인 불가"인 것은 설명을 읽고 대상 제품 자체의 취약점일 때만 알려.
+   - 종료 코드가 2면 조회 실패다. 이번 회차는 이 목록을 건너뛰어.
 
 | 구분 | 핵심 대상 |
 |---|---|

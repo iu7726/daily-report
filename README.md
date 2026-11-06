@@ -23,11 +23,11 @@
 
 | 시각 (KST) | 브리핑 | 다루는 것 |
 |---|---|---|
-| 08:25 | **IT 보안 이슈** | 클라우드(AWS) · AI 개발 도구·MCP · 런타임·프레임워크 · 데이터베이스 · 공급망·CI/CD 분야별 CVE·보안 권고, CISA KEV 등재·실제 악용 여부, 패치 버전과 조치 |
+| 08:25 | **IT 보안 이슈** | 클라우드(AWS) · AI 개발 도구·MCP · 런타임·프레임워크 · 데이터베이스 · 공급망·CI/CD 분야별 CVE·보안 권고(서버·DB 제품은 NVD 신규 CVE까지), CISA KEV 등재·실제 악용 여부, 패치 버전과 조치 |
 | 08:42 | **AI·개발 도구** | OpenAI, Gemini, Claude, MCP 생태계와 AI 개발 도구의 새 소식, 주목할 Agent Skills, 백엔드(Node.js·TypeScript) 적용점 |
 | 08:55 | **S&P500 실적·금리** | 직전 거래일 종가, 기업 실적, Fed 금리, 미 국채, VIX, 원/달러 환율, 이번 주 일정 |
 
-보안 리포트 사이의 빈틈은 **3시간마다 도는 후속 확인·긴급 감시 루틴**이 메웁니다. 아침 리포트가 "오늘 중 보안 릴리스 예정"으로 남긴 것이 나오거나, 핵심 기술에 P1급 공지(CISA KEV 신규 등재, 핵심 패키지의 Critical 권고, 인기 패키지 변조, Node.js 보안 릴리스, 핵심 AWS 서비스 공지)가 뜨면 바로 리포트에 덧붙이고 휴대폰으로 알립니다. 09시 회차는 그날 아침 보고서 3개가 사이트에 올라왔는지도 확인해, 빠진 것이 있으면 알립니다.
+보안 리포트 사이의 빈틈은 **3시간마다 도는 후속 확인·긴급 감시 루틴**이 메웁니다. 아침 리포트가 "오늘 중 보안 릴리스 예정"으로 남긴 것이 나오거나, 핵심 기술에 P1급 공지(CISA KEV 신규 등재, 핵심 패키지의 Critical 권고, 인기 패키지 변조, Node.js 보안 릴리스, 핵심 AWS 서비스 공지, 서버·DB 제품의 원격·무인증 고위험 CVE)가 뜨면 바로 리포트에 덧붙이고 휴대폰으로 알립니다. 09시 회차는 그날 아침 보고서 3개가 사이트에 올라왔는지도 확인해, 빠진 것이 있으면 알립니다.
 
 보고서마다 `긴급 · 주의 · 보통` 세 단계 판정이 붙어서, 캘린더의 색 점만 봐도 그날 챙길 게 있는지 알 수 있습니다.
 
@@ -92,7 +92,7 @@ flowchart LR
 
 ```
 daily-report/
-├── scheduler/          # 루틴 프롬프트 (공통 규칙 + 작업 3개)
+├── scheduler/          # 루틴 프롬프트 (공통 규칙 + 작업 4개), 보안 조회 스크립트
 ├── reports/            # 루틴이 쓴 보고서 (작업/년/월/일.md)
 ├── watch/              # 보안 후속 확인 대기 목록, 긴급 감시로 알린 기록
 ├── web/                # Next.js 정적 사이트
@@ -128,6 +128,9 @@ daily-report/
 | 물결표 취소선 수정 | [`2026-11-03_tilde-strikethrough/plan.md`](.claude/feature/2026-11-03_tilde-strikethrough/plan.md) |
 | 라이선스·보안 정책·템플릿 | [`2026-11-03_community-files/plan.md`](.claude/feature/2026-11-03_community-files/plan.md) |
 | 보고서 누락 알림 | [`2026-11-03_report-missing-alert/plan.md`](.claude/feature/2026-11-03_report-missing-alert/plan.md) |
+| Next.js 16.4.5 업그레이드 | [`2026-11-04_nextjs-16-4-5/plan.md`](.claude/feature/2026-11-04_nextjs-16-4-5/plan.md) |
+| 구글 검색 결과 이름·아이콘 | [`2026-11-04_search-appearance/plan.md`](.claude/feature/2026-11-04_search-appearance/plan.md) |
+| 보안 리포트 누락 보완 (NVD·Hacker News) | [`2026-11-06_security-coverage/plan.md`](.claude/feature/2026-11-06_security-coverage/plan.md) |
 
 기획서에는 결정 사항과 그 이유, 예외 케이스 목록, 계획과 달라진 점, 실제로 돌려 본 검증 결과가 들어 있습니다.
 
