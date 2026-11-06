@@ -6,7 +6,7 @@
 
 | 경로 | 내용 |
 |---|---|
-| `scheduler/` | 루틴이 실행하는 작업 프롬프트. 공통 실행 규칙은 `scheduler/CLAUDE.md` |
+| `scheduler/` | 루틴이 실행하는 작업 프롬프트. 공통 실행 규칙은 `scheduler/CLAUDE.md`, 보안 루틴이 쓰는 조회 스크립트는 `scheduler/scripts/` |
 | `reports/<작업 ID>/YYYY/MM/DD.md` | 루틴이 만든 보고서. frontmatter 정의는 `scheduler/CLAUDE.md`의 '결과 저장' |
 | `watch/watchlist.json` | 보안 후속 확인 대기 목록과 긴급 감시로 알린 기록 (보안 루틴이 추가, 04 루틴이 상태 변경) |
 | `web/` | 보고서 사이트 (Next.js, Vercel 배포) |
