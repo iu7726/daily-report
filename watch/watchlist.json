@@ -49,6 +49,11 @@
       "id": "2026-166-AWS",
       "title": "Babelfish for Aurora PostgreSQL",
       "at": "2026-11-07T06:15:00+09:00"
+    },
+    {
+      "id": "CVE-2026-123158",
+      "title": "OpenSSH sshole 비밀번호 인증 우회 CISA KEV 등재",
+      "at": "2026-11-10T03:15:00+09:00"
     }
   ]
 }
