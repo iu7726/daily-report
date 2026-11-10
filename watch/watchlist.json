@@ -54,6 +54,21 @@
       "id": "CVE-2026-123158",
       "title": "OpenSSH sshole 비밀번호 인증 우회 CISA KEV 등재",
       "at": "2026-11-10T03:15:00+09:00"
+    },
+    {
+      "id": "CVE-2026-120804",
+      "title": "MongoDB Windows SSPI Kerberos 인증 전 서비스 거부",
+      "at": "2026-11-11T06:15:00+09:00"
+    },
+    {
+      "id": "CVE-2026-120808",
+      "title": "MongoDB macOS IPv6 TLS 인증서 검증 우회",
+      "at": "2026-11-11T06:15:00+09:00"
+    },
+    {
+      "id": "CVE-2026-120813",
+      "title": "MongoDB CSFLE 스키마 암호화 누락",
+      "at": "2026-11-11T06:15:00+09:00"
     }
   ]
 }
