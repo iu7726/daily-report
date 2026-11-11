@@ -29,9 +29,9 @@
       "report": "reports/security-daily-report/2026/11/05.md",
       "created": "2026-11-05",
       "until": "2026-11-12",
-      "status": "open",
-      "done_at": null,
-      "result": null
+      "status": "done",
+      "done_at": "2026-11-12T03:15:00+09:00",
+      "result": "Node.js 22.23.5·24.22.3·26.13.1 공개: High 7건, Medium 6건, Low 3건"
     }
   ],
   "alerted": [
