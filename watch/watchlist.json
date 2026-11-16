@@ -89,6 +89,16 @@
       "id": "CVE-2026-116330",
       "title": "PostgreSQL 11월 보안 릴리스 임의 코드 실행",
       "at": "2026-11-13T00:17:00+09:00"
+    },
+    {
+      "id": "MAL-2026-19944",
+      "title": "npm @univerjs-pro/sheets-pivot-chart 1.5.0 악성 버전",
+      "at": "2026-11-16T12:15:00+09:00"
+    },
+    {
+      "id": "GHSA-h6jf-g8cj-x4v3",
+      "title": "npm @univerjs-pro/sheets-pivot-chart 1.5.0 악성 버전",
+      "at": "2026-11-16T12:15:00+09:00"
     }
   ]
 }
