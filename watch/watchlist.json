@@ -49,6 +49,22 @@
       "status": "done",
       "done_at": "2026-11-20T18:15:00+09:00",
       "result": "GitLab 19.6.1·19.5.8·19.4.10 공개(Ruby 3.3.14·3.4.13 반영)"
+    },
+    {
+      "id": "ghes-ruby2shell-fix-2026-11",
+      "title": "GitHub Enterprise Server Ruby2Shell 수정판과 11월 25일 PoC 공개",
+      "check": "GitHub Enterprise Server가 Ruby 2026-11-18 보안 수정(CVE-2026-132825, Ruby2Shell)을 반영한 패치 릴리스(3.22.6 등)나 공지를 내거나, Veria Labs가 예고대로 11월 25일 PoC를 공개함",
+      "sources": [
+        "https://docs.github.com/en/enterprise-server@3.22/admin/release-notes",
+        "https://verialabs.com/ruby2shell/",
+        "https://github.blog/changelog/"
+      ],
+      "report": "reports/security-daily-report/2026/11/21.md",
+      "created": "2026-11-21",
+      "until": "2026-11-26",
+      "status": "open",
+      "done_at": null,
+      "result": null
     }
   ],
   "alerted": [
