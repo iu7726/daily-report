@@ -46,9 +46,9 @@
       "report": "reports/security-daily-report/2026/11/20.md",
       "created": "2026-11-20",
       "until": "2026-11-26",
-      "status": "open",
-      "done_at": null,
-      "result": null
+      "status": "done",
+      "done_at": "2026-11-20T18:15:00+09:00",
+      "result": "GitLab 19.6.1·19.5.8·19.4.10 공개(Ruby 3.3.14·3.4.13 반영)"
     }
   ],
   "alerted": [
