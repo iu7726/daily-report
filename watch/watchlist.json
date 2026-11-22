@@ -62,9 +62,9 @@
       "report": "reports/security-daily-report/2026/11/21.md",
       "created": "2026-11-21",
       "until": "2026-11-26",
-      "status": "open",
-      "done_at": null,
-      "result": null
+      "status": "done",
+      "done_at": "2026-11-23T08:40:00+09:00",
+      "result": "GHES 3.22.6·3.21.11·3.20.13·3.19.17 공개(2026-11-22, Ruby 수정 CRITICAL)"
     }
   ],
   "alerted": [
