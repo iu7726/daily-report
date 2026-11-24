@@ -65,6 +65,21 @@
       "status": "done",
       "done_at": "2026-11-23T08:40:00+09:00",
       "result": "GHES 3.22.6·3.21.11·3.20.13·3.19.17 공개(2026-11-22, Ruby 수정 CRITICAL)"
+    },
+    {
+      "id": "ruby2shell-poc-2026-11-25",
+      "title": "Ruby2Shell PoC 공개 (11월 25일 예정)",
+      "check": "Veria Labs가 예고대로 Ruby2Shell(CVE-2026-132825 외) Rails 원격 코드 실행 PoC를 공개하거나 공개 연기를 발표함, 또는 영향 표의 GHES 항목이 갱신됨",
+      "sources": [
+        "https://verialabs.com/ruby2shell/",
+        "https://www.ruby-lang.org/en/news/2026/11/18/multiple-vulnerabilities-in-regexp-and-string/"
+      ],
+      "report": "reports/security-daily-report/2026/11/25.md",
+      "created": "2026-11-25",
+      "until": "2026-11-28",
+      "status": "open",
+      "done_at": null,
+      "result": null
     }
   ],
   "alerted": [
