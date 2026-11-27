@@ -1,7 +1,8 @@
 import type { Element, ElementContent } from "hast";
-import type { ReactNode } from "react";
+import { Children, isValidElement, type ReactNode } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { isPriority, PriorityBadge } from "@/components/PriorityBadge";
 import { FlowBlock, TimelineBlock, TrendBlock, type TrendContext } from "@/components/ReportBlocks";
 import { isBlockLanguage, parseFlow, parseTimeline, parseTrend, type BlockLanguage } from "@/lib/blocks";
 import { remarkFoldSections } from "@/lib/fold-sections";
@@ -18,6 +19,12 @@ const isExternal = (href?: string) => !!href && /^https?:\/\//i.test(href);
 function withoutNode<T extends { node?: unknown }>({ node, ...rest }: T): Omit<T, "node"> {
   void node;
   return rest;
+}
+
+/** 자식이 글자 하나뿐이면 그 글자 */
+function onlyText(children: ReactNode): string | null {
+  const list = Children.toArray(children);
+  return list.length === 1 && typeof list[0] === "string" ? list[0].trim() : null;
 }
 
 /** 코드 블록(pre > code)의 언어와 글자 */
@@ -44,10 +51,32 @@ function renderBlock(language: BlockLanguage, text: string, trend?: TrendContext
   return keys && trend ? <TrendBlock keys={keys} context={trend} /> : null;
 }
 
+/** 소제목 앞의 `① [P1]`을 번호와 배지로 나눈다. */
+const HEADING_PRIORITY_RE = /^([①-⑳]\s*)?\[(P[123])\]\s*/;
+
+function withPriorityBadge(children: ReactNode): ReactNode {
+  const list = Children.toArray(children);
+  const first = list[0];
+  if (typeof first !== "string") return children;
+  const match = HEADING_PRIORITY_RE.exec(first);
+  if (!match || !isPriority(match[2])) return children;
+  return [
+    match[1] ?? "",
+    <PriorityBadge key="priority" priority={match[2]} />,
+    " ",
+    first.slice(match[0].length),
+    ...list.slice(1).map((child, i) => (isValidElement(child) ? child : <span key={`rest-${i}`}>{child}</span>)),
+  ];
+}
+
 function buildComponents(trend?: TrendContext): Components {
   return {
     // 페이지 제목(h1)은 하나만 두기 위해 본문의 h1은 h2로 낮춘다.
     h1: (props) => <h2 {...withoutNode(props)} />,
+    h3: (props) => {
+      const rest = withoutNode(props);
+      return <h3 {...rest}>{withPriorityBadge(rest.children)}</h3>;
+    },
     a: (props) => {
       const rest = withoutNode(props);
       return isExternal(rest.href) ? <a {...rest} target="_blank" rel="noopener noreferrer" /> : <a {...rest} />;
@@ -58,6 +87,18 @@ function buildComponents(trend?: TrendContext): Components {
         <table {...withoutNode(props)} />
       </div>
     ),
+    // 표 칸의 P1·P2·P3는 배지로 보여 준다(기획서 2026-11-27_report-visuals R2).
+    td: (props) => {
+      const rest = withoutNode(props);
+      const text = onlyText(rest.children);
+      return text && isPriority(text) ? (
+        <td {...rest}>
+          <PriorityBadge priority={text} />
+        </td>
+      ) : (
+        <td {...rest} />
+      );
+    },
     pre: (props) => {
       const block = codeBlock(props.node);
       if (block && isBlockLanguage(block.language)) {

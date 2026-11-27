@@ -132,4 +132,11 @@ describe("Markdown 그림 블록과 배지", () => {
     expect(html).toContain("추이는 값이 쌓이면 보입니다");
     expect(html).not.toContain("<svg");
   });
+
+  it("표 칸과 소제목의 P1·P2·P3를 배지로 바꾼다", () => {
+    const html = render("### ① [P2] AWS Config 런북\n\n| 분야 | 상태 |\n|---|---|\n| AWS | P1 |\n| DB | 이상 없음 |\n");
+    expect(html).toMatch(/<h3 id="[^"]+">① <span[^>]*>P2<\/span> AWS Config 런북<\/h3>/);
+    expect(html).toMatch(/<td><span[^>]*>P1<\/span><\/td>/);
+    expect(html).toContain("<td>이상 없음</td>");
+  });
 });
