@@ -53,8 +53,12 @@
 
 보안 루틴(03·04)이 쓰는 조회 스크립트는 `scripts/`에 있다. 표준 라이브러리만 쓰고, 조회에 실패하면 종료 코드 2로 끝나 "새 소식 없음"과 구별된다.
 
-- `nvd_scan.py`: NVD에 새로 공개된 CVE 중 npm 밖 점검 대상 제품(OpenSSH, OpenSSL, nginx, PostgreSQL, MariaDB, Redis, Docker, Kubernetes, Git 등)에 해당하는 것. CVE.org의 영향 제품으로 설명에 이름만 나온 다른 제품을 걸러 낸다. 아침 리포트는 48시간, 긴급 감시는 3시간 30분을 본다.
+- `nvd_scan.py`: NVD에 새로 공개된 CVE 중 npm 밖 점검 대상 제품(OpenSSH, OpenSSL, nginx, PostgreSQL, MariaDB, Redis, Docker, Kubernetes, Git 등)과 Java·Python 주요 제품(OpenJDK, Spring, Tomcat, Log4j, Jackson, CPython, Django 등)에 해당하는 것. CVE.org의 영향 제품으로 설명에 이름만 나온 다른 제품을 걸러 낸다. 아침 리포트는 48시간, 긴급 감시는 3시간 30분을 본다.
 - `hn_top.py`: Hacker News에서 최근 24시간 동안 화제가 된 글 제목. 아침 리포트가 놓친 사건이 없는지 대조하는 데만 쓰고, 출처로는 쓰지 않는다.
+
+## 보고서 검사 스크립트
+
+`scripts/report_lint.py`는 아침 보고서 세 작업(01·02·03)이 커밋하기 전에 실행한다. 본문 분량, 마지막 `## 조사 기록` 절, `summary` 길이, 조사 기록에 둘 문형이 본문에 섞였는지, 고정 표기와 명령형을 문장에 썼는지 검사한다. 종료 코드는 0(통과), 1(고칠 것 있음), 2(실행 오류)다. 기준은 `CLAUDE.md`의 '글쓰기'에 있다.
 
 ## 작업 추가하기
 

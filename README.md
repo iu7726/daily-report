@@ -23,7 +23,7 @@
 
 | 시각 (KST) | 브리핑 | 다루는 것 |
 |---|---|---|
-| 08:25 | **IT 보안 이슈** | 클라우드(AWS) · AI 개발 도구·MCP · 런타임·프레임워크 · 데이터베이스 · 공급망·CI/CD 분야별 CVE·보안 권고(서버·DB 제품은 NVD 신규 CVE까지), CISA KEV 등재·실제 악용 여부, 패치 버전과 조치 |
+| 08:25 | **IT 보안 이슈** | 클라우드(AWS) · AI 개발 도구·MCP · 런타임·프레임워크 · 데이터베이스 · 공급망·CI/CD 분야별 CVE·보안 권고(서버·DB 제품은 NVD 신규 CVE까지), CISA KEV 등재·실제 악용 여부, 패치 버전과 조치. Node.js·TypeScript가 중심이고, Java·Python은 주요 런타임·프레임워크·공급망과 화제가 된 사건까지 |
 | 08:42 | **AI·개발 도구** | OpenAI, Gemini, Claude, MCP 생태계와 AI 개발 도구의 새 소식, 주목할 Agent Skills, 백엔드(Node.js·TypeScript) 적용점 |
 | 08:55 | **S&P500 실적·금리** | 직전 거래일 종가, 기업 실적, Fed 금리, 미 국채, VIX, 원/달러 환율, 이번 주 일정 |
 
@@ -131,6 +131,7 @@ daily-report/
 | Next.js 16.4.5 업그레이드 | [`2026-11-04_nextjs-16-4-5/plan.md`](.claude/feature/2026-11-04_nextjs-16-4-5/plan.md) |
 | 구글 검색 결과 이름·아이콘 | [`2026-11-04_search-appearance/plan.md`](.claude/feature/2026-11-04_search-appearance/plan.md) |
 | 보안 리포트 누락 보완 (NVD·Hacker News) | [`2026-11-06_security-coverage/plan.md`](.claude/feature/2026-11-06_security-coverage/plan.md) |
+| 보고서 문체·분량과 긴급 건 재설명 | [`2026-11-27_report-writing/plan.md`](.claude/feature/2026-11-27_report-writing/plan.md) |
 
 기획서에는 결정 사항과 그 이유, 예외 케이스 목록, 계획과 달라진 점, 실제로 돌려 본 검증 결과가 들어 있습니다.
 

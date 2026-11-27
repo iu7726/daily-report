@@ -14,7 +14,7 @@
 
 대부분의 회차는 셋 다 해당이 없다. 그럴 때는 아무것도 바꾸지 말고, 커밋도 알림도 없이 끝내.
 
-공통 규칙의 '정확성'과 '글쓰기'를 따르고, '결과 저장'은 0단계(저장소 맞추기)만 해. 1~3단계(이전 보고 확인, 새 보고서 파일, frontmatter 작성)는 적용하지 마. 커밋·push·알림은 아래 절차대로 해.
+공통 규칙의 '정확성'과 '글쓰기'를 따르되, '분량'과 조사 기록 절은 적용하지 마(리포트에 덧붙이는 절이라서). '결과 저장'은 0단계(저장소 맞추기)만 해. 1~4단계(이전 보고 확인, 새 보고서 파일, frontmatter 작성, 검사)는 적용하지 마. 커밋·push·알림은 아래 절차대로 해.
 
 ### A. 후속 확인
 
@@ -29,18 +29,18 @@
 
 1. **CISA KEV**: `https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json` (안 되면 `https://raw.githubusercontent.com/cisagov/kev-data/develop/known_exploited_vulnerabilities.json`). `dateAdded`는 날짜 단위라 최근 2일에 추가된 항목을 보고, 아래 '중복 확인'으로 이미 다룬 것을 거른다.
    - 알릴 것: `vendorProject`·`product`가 핵심 제품(아래 표)에 해당하는 항목
-2. **OSV (GitHub 보안 DB 미러)**: `https://osv-vulnerabilities.storage.googleapis.com/npm/modified_id.csv`와 `.../GitHub%20Actions/modified_id.csv`. 최근 수정순이라 앞부분만 받으면 돼(`curl -s <URL> | head -n 2000`). 조사 기간에 수정된 ID만 `https://api.osv.dev/v1/vulns/<ID>`로 열어.
+2. **OSV (GitHub 보안 DB 미러)**: `https://osv-vulnerabilities.storage.googleapis.com/<생태계>/modified_id.csv`. 생태계는 `npm`, `GitHub%20Actions`, `Maven`, `PyPI`다. 최근 수정순이라 앞부분만 받으면 돼(`curl -s <URL> | head -n 2000`). 조사 기간에 수정된 ID만 `https://api.osv.dev/v1/vulns/<ID>`로 열어.
    - 알릴 것 ①: `GHSA-` 권고 중 `database_specific.severity`가 `CRITICAL`이고 `published`가 최근 2일 안이며, 다음 중 하나에 해당하는 것
-     - 핵심 npm 패키지(아래 표)나 `actions/*` 공식 액션
-     - 핵심 목록에 없어도 주간 다운로드 100만 이상인 npm 패키지(`https://api.npmjs.org/downloads/point/last-week/<패키지>`)
-   - 알릴 것 ②: `MAL-` 악성 패키지 중 **이미 널리 쓰이던 패키지**의 악성 버전. `https://api.npmjs.org/downloads/point/last-week/<패키지>`의 주간 다운로드가 10만 이상이면 해당한다(인기 패키지 계정 탈취·변조 배포). 새로 만든 사칭 패키지는 알리지 마.
+     - 핵심 npm·Maven·PyPI 패키지(아래 표)나 `actions/*` 공식 액션
+     - 핵심 목록에 없어도 주간 다운로드 100만 이상인 npm 패키지(`https://api.npmjs.org/downloads/point/last-week/<패키지>`)나 PyPI 패키지(`https://pypistats.org/api/packages/<패키지>/recent`의 `last_week`)
+   - 알릴 것 ②: `MAL-` 악성 패키지 중 **이미 널리 쓰이던 패키지**의 악성 버전(인기 패키지 계정 탈취·변조 배포). npm·PyPI는 위 주소의 주간 다운로드가 10만 이상이면 해당하고, 다운로드 수를 조회하지 못하면 핵심 패키지만 본다. Maven은 핵심 패키지만 본다. 새로 만든 사칭 패키지는 알리지 마.
 3. **Node.js 보안 릴리스**: `https://nodejs.org/en/feed/vulnerability.xml`. 조사 기간에 올라온 글을 열어 봐.
    - 알릴 것: 보안 릴리스가 실제로 나왔고 High 이상 취약점이 있는 경우
    - 예고 글(아직 릴리스 전)이면 알리지 말고, 릴리스 예정일로 대기 목록(A)에 항목을 올려.
 4. **AWS Security Bulletins**: `https://aws.amazon.com/security/security-bulletins/rss/feed/`. 항목이 날짜순이 아니니 `pubDate`로 걸러.
    - 알릴 것: 핵심 AWS 서비스(아래 표)에 영향이 있고 고객이 조치해야 하는 공지, 또는 실제 악용이 확인됐다고 밝힌 공지
    - AWS 오픈소스 도구·SDK·샘플 공지는 알리지 마(아침 리포트가 다룬다).
-5. **NVD (서버·DB·인프라 CVE)**: OpenSSH, MariaDB처럼 npm 밖 제품의 CVE는 1 ~ 4번에 안 올라온다. 저장소 루트에서 실행해.
+5. **NVD (서버·DB·인프라, Java·Python CVE)**: OpenSSH, MariaDB, OpenJDK, Spring, Tomcat, CPython처럼 npm 밖 제품의 CVE는 1 ~ 4번에 안 올라오거나 늦게 올라온다. 저장소 루트에서 실행해.
 
    ```bash
    python3 -I scheduler/scripts/nvd_scan.py --hours 3.5
@@ -52,8 +52,10 @@
 
 | 구분 | 핵심 대상 |
 |---|---|
-| KEV 핵심 제품 | Node.js, Next.js, React, PostgreSQL, MySQL·MariaDB, MongoDB, Redis·Valkey, GitLab, GitHub(Enterprise Server·Actions), Docker, Kubernetes, nginx, OpenSSL, OpenSSH, Linux 커널, AWS 제품, VS Code, Anthropic·OpenAI 제품 |
+| KEV 핵심 제품 | Node.js, Next.js, React, PostgreSQL, MySQL·MariaDB, MongoDB, Redis·Valkey, GitLab, GitHub(Enterprise Server·Actions), Docker, Kubernetes, nginx, OpenSSL, OpenSSH, Linux 커널, AWS 제품, VS Code, Anthropic·OpenAI 제품, Java(OpenJDK·Oracle Java SE), Spring, Apache Tomcat, Log4j, Python(CPython) |
 | 핵심 npm 패키지 | `next`, `react`, `react-dom`, `react-server-dom-*`, `@nestjs/*`, `express`, `fastify`, `undici`, `typescript`, `pg`, `mysql2`, `mongodb`, `mongoose`, `ioredis`, `redis`, `prisma`, `@prisma/client`, `typeorm`, `@aws-sdk/*`, `jsonwebtoken`, `passport`, `axios`, `@anthropic-ai/claude-code`, `@anthropic-ai/sdk`, `@openai/codex`, `openai`, `@google/gemini-cli`, `@modelcontextprotocol/sdk`, `ai`, `langchain`, `@langchain/*` |
+| 핵심 Maven 패키지 | `org.springframework:*`, `org.springframework.boot:*`, `org.springframework.security:*`, `org.apache.tomcat.embed:tomcat-embed-core`, `org.apache.logging.log4j:log4j-core`, `com.fasterxml.jackson.core:jackson-databind`, `io.netty:*` |
+| 핵심 PyPI 패키지 | `django`, `fastapi`, `flask`, `requests`, `urllib3`, `langchain`, `langchain-*`, `litellm`, `mcp` |
 | 핵심 AWS 서비스 | IAM, EC2, S3, CloudFront, ALB, ECR, ECS·EKS, Lambda, RDS·Aurora, ElastiCache, Cognito, Secrets Manager·KMS |
 
 **중복 확인**: 식별번호(CVE, GHSA, MAL, AWS 공지 번호)가 `watch/watchlist.json`의 `alerted`에 있거나, 가장 최근 보안 리포트 두 개(`reports/security-daily-report/` 아래 날짜가 가장 늦은 두 파일)에 이미 나오면 건너뛰어. 아침 리포트가 다룬 것을 다시 알리지 않으려는 것이다.
@@ -87,6 +89,8 @@
 ### 리포트에 덧붙이기
 
 가장 최근 보안 리포트(`reports/security-daily-report/YYYY/MM/DD.md` 중 날짜가 가장 늦은 것)의 본문에서 `기준 시각:` 줄 바로 다음에 절을 넣어. 사람들은 최신 리포트를 보니까 항목을 처음 올린 리포트가 아니라 최신 리포트에 넣는다. 여러 절이 쌓이면 최근 것이 위로 오게 해.
+
+덧붙인 사건은 다음 날 아침 보안 리포트(03)가 '주요 항목'에 다시 자세히 쓴다. 그래도 알림을 받고 바로 여는 곳은 이 절이니, 이 절만 읽어도 할 일을 알 수 있게 써.
 
 ```markdown
 ## 긴급 감시 (MM-DD HH:mm KST) — <제목>
