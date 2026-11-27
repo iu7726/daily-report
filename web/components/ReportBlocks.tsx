@@ -78,16 +78,23 @@ export function FlowBlock({ steps }: { steps: string[] }) {
 
 export type TrendContext = { task: string; series: Record<string, SeriesPoint[]>; window: TrendWindow };
 
-/** 정의된 지표가 하나도 없으면 null. 호출한 쪽이 원래 코드 블록을 보여 준다. */
+/**
+ * 정의된 지표가 하나도 없으면 null. 호출한 쪽이 원래 코드 블록을 보여 준다.
+ * 값이 아직 없는 지표(휴장일의 시장 값 등)는 빈 타일 대신 뺀다. 모두 비었으면 한 줄 안내만 보여 준다.
+ */
 export function TrendBlock({ keys, context }: { keys: string[]; context: TrendContext }) {
   const tiles = keys.flatMap((key) => {
     const info = getMetricInfo(context.task, key);
     return info ? [{ key, info, points: context.series[key] ?? [] }] : [];
   });
   if (tiles.length === 0) return null;
+  const withData = tiles.filter((tile) => tile.points.length > 0);
+  if (withData.length === 0) {
+    return <p className="not-prose my-4 text-xs text-muted">추이 차트는 값이 쌓이면 보입니다.</p>;
+  }
   return (
     <div className="not-prose my-6 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-      {tiles.map((tile) => (
+      {withData.map((tile) => (
         <MetricTile key={tile.key} info={tile.info} points={tile.points} window={context.window} />
       ))}
     </div>

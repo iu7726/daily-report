@@ -16,7 +16,7 @@
 - Agent Skills 및 MCP 생태계
 - 그 밖의 AI 에이전트 및 개발 도구
 
-공식 블로그, 공식 계정, 릴리스 노트, GitHub 릴리스·체인지로그를 우선 검색해 소식을 모아. 중요한 3~6건은 '소식'에, 의존성 갱신처럼 할 일이 거의 없는 것은 '짧은 소식'에 써.
+공식 블로그, 공식 계정, 릴리스 노트, GitHub 릴리스·체인지로그를 우선 검색해 소식을 모아. 중요한 3~5건은 '소식'에, 의존성 갱신처럼 할 일이 거의 없는 것은 '짧은 소식'에 써.
 Node.js, NestJS, TypeScript 백엔드 개발에 영향을 주는 소식을 우선해.
 
 보고서 구성:
@@ -34,9 +34,10 @@ Node.js, NestJS, TypeScript 백엔드 개발에 영향을 주는 소식을 우�
    - 제목: ``### `스킬 이름` (저장소)``
    - 하는 일 2~3문장
    - 값 표 `| 설치 수 | 처음 등록 | 보안 감사 |`. 설치 수는 출처에 표시된 값 그대로 쓰고 확인 날짜를 붙여. 처음 등록이 오래됐으면 "신규 아님"으로 밝혀. 보안 감사 결과를 찾지 못하면 "확인 불가".
+   - 보안 감사에 Fail이 있는 스킬은 고르지 마. 화제가 커서 꼭 다뤄야 하면 인용 블록 첫 문장에 Fail 결과를 밝혀.
    - 인용 블록: Node.js·NestJS·TypeScript 백엔드 작업에서 쓸 만한지, 주의할 점(권한, 실행 범위)
    - 설치 명령(원문에 있는 그대로)과 원문 링크
-   - 이전 보고서에서 소개한 스킬은 설치 수나 내용이 크게 바뀐 경우에만 다시 다뤄. 스킬은 조사만 하고 직접 설치하지 마.
+   - 이전 보고서에서 소개한 스킬은 설치 수나 내용이 크게 바뀐 경우에만 다시 다뤄. 소개한 적이 있는지는 ``grep -h '^### `' reports/ai-dev-briefing/*/*/*.md``로 확인해. 스킬은 조사만 하고 직접 설치하지 마.
 5. **조사 기록**: 확인 기간, 새 소식이 없던 출처와 지금 버전, 원문에 맡기고 덜어 낸 변경, 스킬 후보에서 뺀 이유.
 
 새 소식이 없어도 주목할 Agent Skills와 조사 기록은 써.
@@ -48,7 +49,7 @@ Node.js, NestJS, TypeScript 백엔드 개발에 영향을 주는 소식을 우�
 | 분야 | 출처 |
 |---|---|
 | GPT / Codex | [OpenAI 뉴스](https://openai.com/news/), [OpenAI API 변경 이력](https://developers.openai.com/api/docs/changelog), [Codex 릴리스](https://github.com/openai/codex/releases) |
-| Gemini / Google AI | [Google DeepMind 블로그](https://deepmind.google/blog/), [Gemini API 변경 이력](https://ai.google.dev/gemini-api/docs/changelog), [Gemini CLI 릴리스](https://github.com/google-gemini/gemini-cli/releases) |
+| Gemini / Google AI | [Google DeepMind 블로그](https://deepmind.google/blog/), [Gemini API 변경 이력](https://aistudio.google.com/docs/changelog), [Gemini CLI 릴리스](https://github.com/google-gemini/gemini-cli/releases) |
 | Claude / Claude Code | [Anthropic 뉴스](https://www.anthropic.com/news), [Claude Platform 릴리스 노트](https://platform.claude.com/docs/en/release-notes/overview), [Claude Code 변경 이력](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) |
 | Agent Skills | [skills.sh](https://skills.sh/) (트렌딩·설치 수), [Anthropic Skills](https://github.com/anthropics/skills), [Vercel Agent Skills](https://github.com/vercel-labs/agent-skills) |
 | MCP | [MCP 블로그](https://blog.modelcontextprotocol.io/), [MCP TypeScript SDK 릴리스](https://github.com/modelcontextprotocol/typescript-sdk/releases) |
