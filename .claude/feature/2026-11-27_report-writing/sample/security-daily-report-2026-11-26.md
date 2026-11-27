@@ -8,6 +8,7 @@ summary: "새 P1은 없습니다. AWS Config 자동 조치로 Session Manager �
 headline: "AWS Config 런북 CVE-2026-134070, MongoDB 드라이버 CVE, tsc 사칭 악성 패키지"
 description: "AWS Config 자동 조치 런북의 Session Manager 설정 주입, 새벽 긴급 감시로 알린 MongoDB 드라이버 CVE, GitLab 보안 패치 13건, TypeScript tsc를 가로채 GitHub Actions 비밀을 빼 가는 npm 악성 패키지를 정리했습니다."
 tags: ["AWS", "CVE-2026-134070", "Kiro", "GitLab", "MongoDB", "TypeScript", "GitHub Actions", "npm"]
+metrics: {p1: 0, p2: 2, p3: 7, malicious_npm: 32, kev_added: 10}
 ---
 [2026-11-26 IT 보안 이슈 리포트]
 기준 시각: 2026-11-26 08:40 KST
@@ -29,13 +30,30 @@ tags: ["AWS", "CVE-2026-134070", "Kiro", "GitLab", "MongoDB", "TypeScript", "Git
 | 데이터베이스 | P2 | ② MongoDB 드라이버, ⑤ PostgreSQL 연동 확장 |
 | 공급망·CI/CD·인프라 | P3 | ⑥ GitLab, ⑦ Docker Engine, ⑧ npm 악성 패키지, ⑨ 1Password |
 
+```trend
+p1, p2
+```
+
 ## 주요 항목
+
+```timeline
+- 11-25 08:50 | 어제 아침 보안 리포트
+- 11-26 03:15 | 긴급 감시: MongoDB C 드라이버와 Laravel 패키지 CVE 3건 | urgent
+- 11-26 06:15 | 긴급 감시: MongoDB Python 드라이버 CVE 2건 | urgent
+- 11-26 08:40 | 오늘 아침 리포트, ② 항목에서 다시 설명
+```
 
 ### ① [P2] AWS Config 자동 조치 런북 — Session Manager 설정 문서에 명령 주입
 
-AWS 관리형 런북 `AWSConfigRemediation-EnableSystemsManagerSessionManagerAuditLogsToS3`가 `S3KeyPrefix` 값을 제대로 검증하지 않았습니다. 이 런북을 실행할 수 있는 사용자가 값을 조작하면 리전의 Session Manager 기본 설정 문서(`SSM-SessionManagerRunShell`)에 임의 명령을 심을 수 있습니다. 심은 명령은 다른 사용자가 세션을 열 때 인스턴스에서 실행됩니다.
+AWS 관리형 런북 `AWSConfigRemediation-EnableSystemsManagerSessionManagerAuditLogsToS3`가 `S3KeyPrefix` 값을 제대로 검증하지 않아, 아래 순서로 명령이 주입됩니다.
 
-리전에 그 설정 문서가 아직 없을 때만 주입됩니다. 이 런북을 AWS Config 자동 조치나 직접 실행으로 쓰는 계정이 해당하고, Session Manager를 쓰지 않거나 이 런북을 실행한 적이 없다면 해당하지 않습니다.
+```flow
+런북을 실행할 수 있는 사용자가 `S3KeyPrefix` 값을 조작
+리전에 `SSM-SessionManagerRunShell` 문서가 없으면 런북이 조작된 설정으로 문서를 만듦
+다른 사용자가 Session Manager 세션을 열면 심어 둔 명령이 인스턴스에서 실행됨
+```
+
+이 런북을 AWS Config 자동 조치나 직접 실행으로 쓰는 계정이 해당하고, Session Manager를 쓰지 않거나 이 런북을 실행한 적이 없다면 해당하지 않습니다.
 
 | 영향 버전 | 수정 버전 | 식별번호 | CVSS | KEV·실제 악용 |
 |---|---|---|---|---|
