@@ -1,4 +1,4 @@
-"""NVD에 새로 공개된 CVE 중 점검 대상 제품(npm 밖 서버·DB·인프라)에 해당하는 것을 고른다.
+"""NVD에 새로 공개된 CVE 중 점검 대상 제품(npm 밖 서버·DB·인프라, Java·Python 주요 런타임·프레임워크)에 해당하는 것을 고른다.
 
 보안 루틴(03)과 긴급 감시(04)가 쓴다. 표준 라이브러리만 쓴다.
 
@@ -29,14 +29,19 @@ UA = "daily-report-security-routine"
 KST = timezone(timedelta(hours=9))
 
 # 설명에서 찾는 이름. Git만 대소문자를 가린다("a git repository" 같은 일반 표현을 덜 잡으려고).
+# "java", "python"처럼 언어 이름은 넣지 않는다. 설명에 언어 이름만 나오는 CVE가 너무 많다.
 DESC_KEYWORDS = re.compile(
     r"(?i:\b(?:openssh|openssl|nginx|postgresql|mysql|mariadb|mongodb|redis|valkey|docker|containerd|runc|buildkit"
-    r"|kubernetes|gitlab|node\.js|elasticsearch|opensearch)\b)|\bGit\b"
+    r"|kubernetes|gitlab|node\.js|elasticsearch|opensearch"
+    r"|openjdk|java se|corretto|spring|tomcat|log4j|jackson|netty|pgjdbc|hibernate"
+    r"|cpython|django|fastapi|flask|urllib3|psycopg|pymongo|sqlalchemy|langchain|litellm|vllm|llama.?index)\b)|\bGit\b"
 )
 # CVE.org 영향 제품(vendor·product)에서 대상 제품으로 보는 이름.
 TARGET_PRODUCTS = re.compile(
     r"(?i)openssh|openssl|nginx|postgres|mysql|mariadb|mongodb|redis|valkey|docker|moby|containerd|runc|buildkit"
     r"|kubernetes|gitlab|nodejs|node\.js|elasticsearch|opensearch|^git$"
+    r"|openjdk|java se|jdk|jre|corretto|graalvm|spring|tomcat|log4j|jackson|netty|pgjdbc|jdbc|hibernate"
+    r"|cpython|^python$|django|fastapi|flask|urllib3|psycopg|pymongo|sqlalchemy|langchain|litellm|vllm|llama.?index"
 )
 
 
