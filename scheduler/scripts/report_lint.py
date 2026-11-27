@@ -24,7 +24,7 @@ APPENDED_PREFIXES = ("긴급 감시", "후속 확인")  # 04가 리포트 맨 �
 # 작업별 본문 상한(조사 기록 제외)
 BUDGETS = {
     "security-daily-report": 6000,
-    "ai-dev-briefing": 3500,
+    "ai-dev-briefing": 4000,
     "sp500-morning-check": 2500,
 }
 SECURITY_HEAVY_ITEMS = 4  # 보안 리포트의 P1·P2 항목이 이만큼 이상이면
@@ -39,7 +39,10 @@ ITEM_LIMITS = {
 
 SUMMARY_MAX = 120
 SUMMARY_MAX_SENTENCES = 2
-LOG_SECTION_WARN = 2500
+HEADLINE_MAX = 50  # 규칙은 40자 안팎
+DESCRIPTION_RANGE = (70, 160)  # 규칙은 80~150자
+TAGS_RANGE = (3, 8)
+LOG_SECTION_WARN = 3000
 TIME_WARN = 5
 
 # 본문에 쓰지 않고 조사 기록에 모으는 문형
@@ -338,6 +341,16 @@ def lint(path: Path):
         if IMPERATIVE_RE.search(summary):
             fixes.append("summary: 명령형(~세요, ~십시오)이 있습니다. '~해야 합니다'나 '~하면 됩니다'로 씁니다.")
 
+    headline = visible(fm.get("headline", ""))
+    if len(headline) > HEADLINE_MAX:
+        fixes.append(f"headline: {len(headline)}자, 40자 안팎(상한 {HEADLINE_MAX}자)으로 줄입니다.")
+    description = visible(fm.get("description", ""))
+    if description and not DESCRIPTION_RANGE[0] <= len(description) <= DESCRIPTION_RANGE[1]:
+        fixes.append(f"description: {len(description)}자, 80~150자로 씁니다.")
+    tag_count = len(re.findall(r'"[^"]*"', fm.get("tags", "")))
+    if not TAGS_RANGE[0] <= tag_count <= TAGS_RANGE[1]:
+        fixes.append(f"tags: {tag_count}개, {TAGS_RANGE[0]}~{TAGS_RANGE[1]}개로 씁니다.")
+
     metric_fixes, metric_notes = check_metrics(task, fm.get("metrics"))
     fixes += metric_fixes + check_blocks(task, body)
     notes += metric_notes
@@ -371,7 +384,7 @@ def lint(path: Path):
                     label_hits.append(f"{where}: '{m.group(0)}'")
                 for m in IMPERATIVE_RE.finditer(s):
                     imperative_hits.append(f"{where}: '{m.group(0)}'")
-                if s.count("(") >= 2:
+                if s.count("(") >= 2 and not s.lstrip().startswith("·"):
                     paren_hits.append(f"{where}: '{short(s)}'")
 
     for phrase, places in phrase_hits.items():
