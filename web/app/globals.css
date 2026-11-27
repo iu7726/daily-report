@@ -110,6 +110,32 @@ body {
   scroll-margin-top: 6rem;
 }
 
+/* 조사 기록 = 접힌 절. 사이트가 보고서 마지막의 `## 조사 기록` 절을 접어서 보여 준다(lib/fold-sections.ts). */
+.report-prose details.report-fold {
+  margin-top: 3rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 6rem;
+}
+
+.report-prose details.report-fold > summary {
+  cursor: pointer;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--muted);
+}
+
+.report-prose details.report-fold > summary:hover,
+.report-prose details.report-fold[open] > summary {
+  color: var(--foreground);
+}
+
+.report-prose details.report-fold > :not(summary) {
+  font-size: 0.9375rem;
+  color: var(--muted);
+}
+
 /* 인용 = 강조 상자. 보고서는 항목의 실무 영향을 인용으로 쓴다(scheduler/CLAUDE.md '글쓰기'). */
 .report-prose blockquote {
   font-style: normal;

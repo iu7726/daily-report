@@ -1,5 +1,6 @@
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { remarkFoldSections } from "@/lib/fold-sections";
 import { remarkHeadingIds } from "@/lib/headings";
 import { REMARK_GFM_OPTIONS } from "@/lib/markdown";
 
@@ -32,7 +33,11 @@ const components: Components = {
 export function Markdown({ children }: { children: string }) {
   return (
     <div className="report-prose prose prose-zinc max-w-none [&>*:first-child]:mt-0 dark:prose-invert prose-headings:tracking-tight prose-h2:mt-12 prose-h2:text-xl prose-h3:text-base prose-a:font-normal prose-li:my-1 prose-table:my-0">
-      <ReactMarkdown remarkPlugins={[[remarkGfm, REMARK_GFM_OPTIONS], remarkHeadingIds]} components={components}>
+      <ReactMarkdown
+        // 조사 기록 접기(remarkFoldSections)는 소제목 id가 붙은 뒤에 돌아야 한다.
+        remarkPlugins={[[remarkGfm, REMARK_GFM_OPTIONS], remarkHeadingIds, remarkFoldSections]}
+        components={components}
+      >
         {children}
       </ReactMarkdown>
     </div>
