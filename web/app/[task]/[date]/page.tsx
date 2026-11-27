@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LevelBadge } from "@/components/LevelBadge";
 import { Markdown } from "@/components/Markdown";
+import { buildTaskSeries, trendWindow } from "@/lib/metrics";
 import { TableOfContents, TableOfContentsDisclosure } from "@/components/TableOfContents";
 import { TagChip } from "@/components/TagChip";
 import { TaskDateNav } from "@/components/TaskDateNav";
@@ -61,6 +62,8 @@ export default async function ReportPage({ params }: PageProps<"/[task]/[date]">
   const { task, date } = await params;
   const report = getReport(task, date);
   if (!report) notFound();
+  const window = trendWindow(date);
+  const trend = { task, window, series: buildTaskSeries(getReportsByTask(task), task, window) };
 
   const taskTitle = getTaskTitle(task);
   const { prev, next } = getAdjacentInTask(task, date);
@@ -168,7 +171,7 @@ export default async function ReportPage({ params }: PageProps<"/[task]/[date]">
           )}
         </header>
 
-        <Markdown>{report.body}</Markdown>
+        <Markdown trend={trend}>{report.body}</Markdown>
 
         <footer className="flex flex-col gap-8 border-t border-line pt-8">
           <nav aria-label="같은 작업의 다른 날짜" className="grid gap-3 sm:grid-cols-2">

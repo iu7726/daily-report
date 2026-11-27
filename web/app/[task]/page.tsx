@@ -1,5 +1,6 @@
 import { ReportRow } from "@/components/ReportCard";
 import { SecuritySkillNote } from "@/components/SkillCallout";
+import { TaskTrends } from "@/components/TaskTrends";
 import { getAllTaskIds, getReportsByTask, getTaskTitle } from "@/lib/reports";
 import { pageMetadata } from "@/lib/seo";
 import { getTaskInfo } from "@/lib/tasks";
@@ -29,6 +30,8 @@ export default async function TaskPage({ params }: PageProps<"/[task]">) {
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{getTaskTitle(task)}</h1>
         <p className="max-w-2xl text-sm leading-relaxed text-muted sm:text-base">{describe(task)}</p>
       </header>
+
+      <TaskTrends task={task} reports={reports} />
 
       {task === "security-daily-report" && <SecuritySkillNote />}
 
