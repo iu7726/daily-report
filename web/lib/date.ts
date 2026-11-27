@@ -36,6 +36,22 @@ export function toDateString({ y, m, d }: YMD): string {
   return `${y}-${pad2(m)}-${pad2(d)}`;
 }
 
+/** 날짜에 일 수를 더한다. 시간대와 무관하도록 UTC 기준으로 계산한다. 형식이 틀리면 그대로 돌려준다. */
+export function addDays(value: string, delta: number): string {
+  const p = parseDate(value);
+  if (!p) return value;
+  const t = new Date(Date.UTC(p.y, p.m - 1, p.d + delta));
+  return toDateString({ y: t.getUTCFullYear(), m: t.getUTCMonth() + 1, d: t.getUTCDate() });
+}
+
+/** `to` - `from` 일 수. 형식이 틀리면 0. */
+export function daysBetween(from: string, to: string): number {
+  const a = parseDate(from);
+  const b = parseDate(to);
+  if (!a || !b) return 0;
+  return Math.round((Date.UTC(b.y, b.m - 1, b.d) - Date.UTC(a.y, a.m - 1, a.d)) / 86_400_000);
+}
+
 /** 0 = 일요일. 달력 계산이라 시간대와 무관하도록 UTC 기준으로 구한다. */
 export function weekday(y: number, m: number, d: number): number {
   return new Date(Date.UTC(y, m - 1, d)).getUTCDay();

@@ -4,6 +4,7 @@ import { parse as parseYaml } from "yaml";
 import { z } from "zod";
 import { isValidDate } from "./date";
 import { isLevel, type Level } from "./level";
+import { sanitizeMetrics, type MetricValues } from "./metrics";
 import { buildTags, decodeTagParam, type TagInfo } from "./tags";
 import { TASKS, getTaskInfo, taskOrder } from "./tasks";
 
@@ -29,6 +30,8 @@ export type Report = {
   generator: string | null;
   /** 맨 앞 제목 줄과 기준 시각 줄을 뗀 본문 */
   body: string;
+  /** frontmatter `metrics`의 숫자. 없으면 빈 객체(기획서 2026-11-27_report-visuals R4) */
+  metrics: MetricValues;
 };
 
 export type LoadResult = { reports: Report[]; warnings: string[] };
@@ -58,6 +61,7 @@ const frontmatterSchema = z.object({
     .array(z.union([z.string(), z.number()]).transform((value) => String(value).trim()))
     .optional()
     .catch(undefined),
+  metrics: z.unknown().optional(),
 });
 
 /** 본문 첫 줄이 ChatGPT 이전 안내 인용이면 뗀다. 인용은 강조 상자로 보이므로 메타 정보는 본문에서 뺀다. */
@@ -152,6 +156,7 @@ export function parseReport(
       baseTime: stripped.baseTime,
       generator,
       body,
+      metrics: sanitizeMetrics(fm.metrics),
     },
     warnings,
   };

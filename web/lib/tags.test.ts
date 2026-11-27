@@ -15,6 +15,7 @@ const report = (date: string, task: string, tags: string[]): Report => ({
   baseTime: null,
   generator: null,
   body: "",
+  metrics: {},
 });
 
 describe("slugifyTag (D1)", () => {
