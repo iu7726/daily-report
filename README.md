@@ -131,6 +131,7 @@ daily-report/
 | Next.js 16.4.5 업그레이드 | [`2026-11-04_nextjs-16-4-5/plan.md`](.claude/feature/2026-11-04_nextjs-16-4-5/plan.md) |
 | 구글 검색 결과 이름·아이콘 | [`2026-11-04_search-appearance/plan.md`](.claude/feature/2026-11-04_search-appearance/plan.md) |
 | 보안 리포트 누락 보완 (NVD·Hacker News) | [`2026-11-06_security-coverage/plan.md`](.claude/feature/2026-11-06_security-coverage/plan.md) |
+| 보고서 문체·분량과 긴급 건 재설명 | [`2026-11-27_report-writing/plan.md`](.claude/feature/2026-11-27_report-writing/plan.md) |
 
 기획서에는 결정 사항과 그 이유, 예외 케이스 목록, 계획과 달라진 점, 실제로 돌려 본 검증 결과가 들어 있습니다.
 
