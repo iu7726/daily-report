@@ -10,6 +10,8 @@
   --line: #e4e4e7;
   --surface: #fafafa;
   --surface-hover: #f4f4f5;
+  /* 차트 단일 계열 색(dataviz 기본 팔레트 1번, 밝은 화면) */
+  --chart-series: #257de0;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -21,6 +23,7 @@
     --line: #27272a;
     --surface: #111113;
     --surface-hover: #18181b;
+    --chart-series: #338ced;
   }
 }
 

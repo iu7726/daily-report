@@ -1,6 +1,6 @@
 # 보안 리포트 언어 범위 확대 (Java·Python) — 기획서
 
-> 상태: **구현 중 (2026-11-27)**
+> 상태: **구현 중 (2026-11-27)**. 작업 파일·NVD 스캔 수정과 로컬 검증 완료
 > 남은 것: 배포 다음 날 아침 보안 리포트 확인, 루틴 환경의 pypistats 조회 확인
 
 ## 0. TL;DR
@@ -137,7 +137,10 @@ Maven·PyPI 목록도 npm과 같은 형식(`<수정 시각>,<ID>`, 최근 수정
 
 ## 7. 검증
 
-- [ ] `nvd_scan.py`: 11월 17일 이후 구간에서 CVE-2026-114938(Java4Shell), CVE-2026-123886(Spring Data Elasticsearch), pgjdbc CVE가 '대상 제품'으로 나온다.
-- [ ] OSV Maven·PyPI 목록과 상세 조회가 루틴과 같은 명령으로 동작한다.
+- [x] `python3 -I scheduler/scripts/nvd_scan.py --start 2026-11-14T00:00:00Z`(2026-11-27): 11-14 09:00 ~ 11-27 18:28 KST 구간 NVD 7,422건 중 대상 제품 204건이다.
+  - CVE-2026-114938(Java4Shell)이 'Java SE'로 잡히고, CVSS 8.1에 `AV:N`·`PR:N`이라 `alert: true`다. 새 규칙이었다면 11월 18일 새벽 긴급 감시가 알렸을 사건이다.
+  - CVE-2026-123886(Spring Data Elasticsearch, 8.8)과 pgjdbc CVE 8건도 대상 제품으로 나온다.
+  - 새로 넣은 이름으로 들어온 것은 django 11, tomcat 11, java se 10, pgjdbc 8, vllm 7, litellm 7, netty 6, spring 2, flask 2로 13일 동안 64건(하루 5건 안팎)이다.
+- [x] OSV Maven·PyPI 목록과 상세 조회: `curl`로 목록 두 개를 받아 최근 1일·7일 건수를 셌고, `api.osv.dev`에서 Maven 권고(GHSA-563x-q5rq-57qp, `org.apache.tomcat:tomcat-coyote`)를 열었다.
+- [ ] 루틴 환경의 pypistats 조회 가능 여부(Q3). 이 컴퓨터에서는 `requests`의 `last_week`가 나온다.
 - [ ] 첫 아침 실행: Java·Python 항목이 R1·R3대로 들어가고, 보고서가 분량 검사를 통과한다.
-- [ ] 루틴 환경의 pypistats 조회 가능 여부(Q3)

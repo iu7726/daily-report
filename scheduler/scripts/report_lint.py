@@ -11,6 +11,8 @@
 '조사 기록' 절, 긴급 감시·후속 확인 루틴(04)이 덧붙인 절은 본문 분량에서 뺀다.
 """
 
+from __future__ import annotations  # Python 3.9에서도 `str | None` 표기를 쓰려고
+
 import argparse
 import re
 import sys
@@ -49,6 +51,17 @@ IMPERATIVE_RE = re.compile(r"[가-힣]+(세요|십시오)(?=[.!?)\s]|$)")
 AVOID_PHRASES = ["눈여겨볼", "볼 만합니다", "것으로 보입니다", "그대로입니다", "바랍니다"]
 FRONTMATTER_TEXT_KEYS = ("summary", "headline", "description")  # 사이트·검색 결과·알림에 글자 그대로 보인다
 MARKDOWN_RE = re.compile(r"`|\*\*|\]\(")
+# frontmatter `metrics` 키. web/lib/metrics.ts의 METRICS와 같게 둔다.
+METRIC_KEYS = {
+    "security-daily-report": {"p1", "p2", "p3", "malicious_npm", "kev_added"},
+    "sp500-morning-check": {"sp500", "sp500_change_pct", "vix", "us2y", "us10y", "usdkrw"},
+}
+REQUIRED_METRICS = {"security-daily-report": ("p1", "p2", "p3")}
+# 그림 블록. web/lib/blocks.ts와 같은 형식을 검사한다.
+TIMELINE_LINE_RE = re.compile(r"^[-*]\s+[^|]+\|[^|]+(\|\s*(urgent|notice|normal)\s*)?$")
+TIMELINE_LINES = (2, 12)
+FLOW_STEPS = (2, 7)
+TREND_KEYS = (1, 6)
 TIME_RE = re.compile(r"\d{1,2}:\d{2}\s*(?:KST|UTC|PST|PDT|EST|EDT|ET)\b")
 
 LINK_RE = re.compile(r"\[([^\]]*)\]\([^)]*\)")
@@ -107,7 +120,7 @@ def parse_frontmatter(text: str):
 
 
 def split_sections(body: str) -> list[tuple[str, list[str]]]:
-    """첫 두 줄(제목, 기준 시각)과 코드 블록을 빼고 h1·h2 소제목으로 나눈다. 첫 소제목 앞은 이름이 ""다."""
+    """첫 두 줄(제목, 기준 시각)과 코드 블록(timeline·flow 제외)을 빼고 h1·h2 소제목으로 나눈다. 첫 소제목 앞은 이름이 ""다."""
     lines = body.split("\n")
     i = 0
     for pattern in (r"^\[.*\]$", r"^기준 시각"):
@@ -115,12 +128,14 @@ def split_sections(body: str) -> list[tuple[str, list[str]]]:
             i += 1
         if i < len(lines) and re.match(pattern, lines[i].strip()):
             i += 1
-    sections, name, buf, in_fence = [], "", [], False
+    sections, name, buf, fence = [], "", [], None
     for line in lines[i:]:
-        if line.strip().startswith("```"):
-            in_fence = not in_fence
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            fence = None if fence is not None else (stripped[3:].strip() or "code")
             continue
-        if in_fence:
+        # 명령 코드 블록은 분량에서 빼고, 글로 읽히는 timeline·flow 블록은 넣는다.
+        if fence is not None and fence not in ("timeline", "flow"):
             continue
         m = HEADING_RE.match(line)
         if m:
@@ -192,6 +207,73 @@ def short(text: str, n: int = 40) -> str:
     return text if len(text) <= n else text[:n] + "…"
 
 
+def fenced_blocks(body: str) -> list[tuple[str, list[str]]]:
+    """본문의 그림 블록(timeline·flow·trend)을 (언어, 빈 줄을 뺀 줄 목록)으로 모은다."""
+    blocks, lang, buf = [], None, []
+    for line in body.splitlines():
+        stripped = line.strip()
+        if lang is None:
+            m = re.match(r"^```\s*(timeline|flow|trend)\s*$", stripped)
+            if m:
+                lang, buf = m.group(1), []
+        elif stripped.startswith("```"):
+            blocks.append((lang, [x for x in buf if x]))
+            lang = None
+        else:
+            buf.append(stripped)
+    return blocks
+
+
+def check_blocks(task: str, body: str) -> list[str]:
+    fixes = []
+    for lang, rows in fenced_blocks(body):
+        if lang == "timeline":
+            bad = [r for r in rows if not TIMELINE_LINE_RE.match(r)]
+            if not TIMELINE_LINES[0] <= len(rows) <= TIMELINE_LINES[1] or bad:
+                detail = f"'{short(bad[0], 30)}' 형식" if bad else f"{len(rows)}줄"
+                fixes.append(f"timeline 블록: {detail}. 줄마다 `- <시각> | <내용> | <urgent·notice·normal>`로 2~12줄 씁니다.")
+        elif lang == "flow":
+            if not FLOW_STEPS[0] <= len(rows) <= FLOW_STEPS[1]:
+                fixes.append(f"flow 블록: {len(rows)}단계. 한 줄에 단계 하나씩 2~7단계로 씁니다.")
+        else:
+            keys = [k.strip() for r in rows for k in r.split(",") if k.strip()]
+            unknown = [k for k in keys if k not in METRIC_KEYS.get(task, set())]
+            if not TREND_KEYS[0] <= len(keys) <= TREND_KEYS[1] or unknown:
+                detail = f"정의에 없는 키 {', '.join(unknown)}" if unknown else f"키 {len(keys)}개"
+                fixes.append(f"trend 블록: {detail}. 이 작업의 metrics 키 1~6개를 씁니다.")
+    return fixes
+
+
+def check_metrics(task: str, raw: str | None) -> tuple[list[str], list[str]]:
+    """frontmatter `metrics: {키: 숫자, ...}`를 검사한다. (고칠 것, 참고)"""
+    known = METRIC_KEYS.get(task)
+    if known is None:
+        return [], []
+    required = REQUIRED_METRICS.get(task, ())
+    if raw is None:
+        if required:
+            return [f"metrics: 없습니다. `metrics: {{{', '.join(f'{k}: 0' for k in required)}}}`처럼 확인한 숫자를 씁니다."], []
+        return [], ["metrics가 없습니다. 확인한 숫자가 있으면 씁니다(휴장 다음 날처럼 새 값이 없으면 빼도 됩니다)."]
+    body = raw.strip()
+    if not (body.startswith("{") and body.endswith("}")):
+        return ["metrics: 한 줄 흐름 형식 `{키: 숫자, ...}`로 씁니다."], []
+    values, fixes, notes = {}, [], []
+    for pair in filter(None, (x.strip() for x in body[1:-1].split(","))):
+        key, _, value = pair.partition(":")
+        key, value = key.strip(), value.strip()
+        try:
+            values[key] = float(value)
+        except ValueError:
+            fixes.append(f"metrics: '{key}' 값 '{value}'이 숫자가 아닙니다. 단위와 쉼표 없이 숫자만 씁니다.")
+    unknown = [k for k in values if k not in known]
+    if unknown:
+        notes.append(f"metrics에 정의에 없는 키: {', '.join(unknown)} (사이트가 무시합니다)")
+    missing = [k for k in required if k not in values]
+    if missing:
+        fixes.append(f"metrics: {', '.join(missing)}가 없습니다.")
+    return fixes, notes
+
+
 def lint(path: Path):
     """(고칠 것 목록, 참고 목록, 요약 줄)을 돌려준다. 읽지 못하면 ValueError."""
     try:
@@ -255,6 +337,10 @@ def lint(path: Path):
             fixes.append(f"summary: {len(summary)}자 {count}문장, 상한 {SUMMARY_MAX}자 {SUMMARY_MAX_SENTENCES}문장")
         if IMPERATIVE_RE.search(summary):
             fixes.append("summary: 명령형(~세요, ~십시오)이 있습니다. '~해야 합니다'나 '~하면 됩니다'로 씁니다.")
+
+    metric_fixes, metric_notes = check_metrics(task, fm.get("metrics"))
+    fixes += metric_fixes + check_blocks(task, body)
+    notes += metric_notes
 
     for key in FRONTMATTER_TEXT_KEYS:
         if MARKDOWN_RE.search(fm.get(key, "")):
