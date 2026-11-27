@@ -17,14 +17,15 @@
 목록과 공지 페이지는 `curl -sL --max-time 30 -w '%{http_code} %{size_download}\n'`로 직접 받아 날짜로 걸러. 리다이렉트를 따라가야 한다(`-L`, 예: `openssh.com` → `openssh.org`). 응답 코드가 200이 아니거나 본문이 안내 페이지 수준("Moved Permanently", "Forbidden" 같은 몇 KB짜리)이면 조회 실패다. 실패한 출처를 보고 "새 공지 없음"으로 판단하지 마.
 
 1. **AWS Security Bulletins**: RSS `https://aws.amazon.com/security/security-bulletins/rss/feed/`. 항목이 날짜순이 아니니 `pubDate`로 걸러. 조사 기간에 올라온 공지는 모두 다뤄. 서비스 자체 공지뿐 아니라 AWS 오픈소스 도구·SDK·MCP 서버 공지도 포함이다.
-2. **GitHub 보안 DB 권고 (npm, GitHub Actions)**: GitHub 보안 DB를 그대로 옮겨 오는 OSV 미러로 봐. 루틴 환경에서는 `api.github.com`이 막혀 있다(연결된 저장소 API만 허용).
-   - 목록: `https://osv-vulnerabilities.storage.googleapis.com/npm/modified_id.csv`, `https://osv-vulnerabilities.storage.googleapis.com/GitHub%20Actions/modified_id.csv`. 한 줄이 `수정 시각(UTC),ID`이고 최근 수정순이다. 조사 기간에 수정된 ID만 골라.
+2. **GitHub 보안 DB 권고 (npm, GitHub Actions, Maven, PyPI)**: GitHub 보안 DB를 그대로 옮겨 오는 OSV 미러로 봐. 루틴 환경에서는 `api.github.com`이 막혀 있다(연결된 저장소 API만 허용).
+   - 목록: `https://osv-vulnerabilities.storage.googleapis.com/<생태계>/modified_id.csv`. 생태계는 `npm`, `GitHub%20Actions`, `Maven`, `PyPI` 네 개다. 한 줄이 `수정 시각(UTC),ID`이고 최근 수정순이다. 조사 기간에 수정된 ID만 골라.
    - 상세: `https://api.osv.dev/v1/vulns/<ID>`. `GHSA-`는 GitHub 검토 권고, `MAL-`은 악성 패키지다. `published`(또는 `database_specific.github_reviewed_at`)가 조사 기간이면 신규, 아니면 기존 권고의 변경이다. 변경은 심각도 상향, 수정 버전 추가, 실제 악용 확인처럼 중요한 것만 다뤄.
    - Claude Code(`@anthropic-ai/claude-code`), Codex(`@openai/codex`), Gemini CLI(`@google/gemini-cli`)는 npm 패키지라 권고가 여기에 올라온다.
    - 점검 대상 분야의 패키지이거나 널리 쓰이는 패키지(AI·MCP, 인증·토큰, DB, HTTP 관련)는 항목으로 다뤄. 나머지는 "그 밖의 npm 권고 N건"처럼 건수만 조사 기록에 적어.
-3. **악성 패키지 (npm)**: 2번 목록의 `MAL-` 항목. 보통 하루 수십 건이라 다 쓰지 마. 전체 건수를 적고, AI·MCP 도구나 점검 대상 생태계(Next.js, NestJS, DB 드라이버, AWS SDK 등)를 사칭하는 것만 골라 다뤄. 비슷한 이름이 여러 개면 묶어서 한 항목으로 써.
+   - Maven·PyPI 권고는 아래 '점검 대상'의 Java·Python 대상이거나 '언어와 관계없이 다루는 사건'에 해당하는 것만 상세를 열어 봐. 나머지는 건수만 조사 기록에 적어.
+3. **악성 패키지 (npm, PyPI, Maven)**: 2번 목록의 `MAL-` 항목. 보통 하루 수십 건이라 다 쓰지 마. 생태계별 전체 건수를 적고, AI·MCP 도구나 점검 대상 생태계(Next.js, NestJS, DB 드라이버, AWS SDK, Spring, Django, LangChain 등)를 사칭하는 것만 골라 다뤄. 비슷한 이름이 여러 개면 묶어서 한 항목으로 써. 이미 널리 쓰이던 패키지가 탈취돼 악성 버전이 나온 것은 '언어와 관계없이 다루는 사건'이다.
 4. **CISA KEV**: `https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json` (접속이 안 되면 `https://raw.githubusercontent.com/cisagov/kev-data/develop/known_exploited_vulnerabilities.json`). `catalogVersion`과 조사 기간에 추가된 항목(`dateAdded`)을 확인해. 점검 대상에 해당하면 P1 항목으로 다루고, 해당하지 않는 신규 등재는 조사 기록에 한 줄씩 적어.
-5. **NVD 신규 CVE (서버·DB·인프라)**: OpenSSH, OpenSSL, nginx, PostgreSQL, MySQL·MariaDB, MongoDB, Redis·Valkey, Docker, Kubernetes, GitLab, Git, Elasticsearch·OpenSearch 같은 npm 밖 제품은 1 ~ 4번 목록에 안 올라온다. 저장소 루트에서 아래 스크립트로 직전 **48시간**에 NVD에 공개된 CVE를 받아 걸러.
+5. **NVD 신규 CVE (서버·DB·인프라, Java·Python)**: OpenSSH, OpenSSL, nginx, PostgreSQL, MySQL·MariaDB, MongoDB, Redis·Valkey, Docker, Kubernetes, GitLab, Git, Elasticsearch·OpenSearch 같은 npm 밖 제품과 OpenJDK, Spring, Tomcat, Log4j, Jackson, CPython, Django 같은 Java·Python 제품은 1 ~ 4번 목록에 안 올라오거나 늦게 올라온다. 저장소 루트에서 아래 스크립트로 직전 **48시간**에 NVD에 공개된 CVE를 받아 걸러.
 
    ```bash
    python3 -I scheduler/scripts/nvd_scan.py --hours 48
@@ -59,7 +60,7 @@
    ```
 
    - `[보안]` 표시 글만 보지 말고 제목을 모두 훑어. 취약점에 별명을 붙인 제목(예: "sshole")은 단어로 못 잡는다.
-   - 점검 대상에 닿는데 위에서 못 찾은 사건이 있으면 1차 자료(벤더 공지, 보안 권고, NVD)를 찾아 확인하고 다뤄. Hacker News 글 자체는 출처로 쓰지 마. 1차 자료로 확인되지 않으면 '미확인 보도'에 적어.
+   - 취약점이나 공격 사건은 언어와 관계없이 다뤄('언어와 관계없이 다루는 사건'). 위에서 못 찾은 것은 1차 자료(벤더 공지, 보안 권고, NVD)를 찾아 확인해. 기사, 행사, 장애 소식처럼 취약점·공격이 아닌 글은 넘어가. Hacker News 글 자체는 출처로 쓰지 마. 1차 자료로 확인되지 않으면 '미확인 보도'에 적어.
    - 종료 코드가 2면 건너뛰고 조사 기록에 적어.
 
 목록 조회에 실패하면 그 사실을 조사 기록에 적어. 실패를 "이슈 없음"으로 쓰지 마.
@@ -75,12 +76,23 @@
 | 분야 | 핵심 | 추가 |
 |---|---|---|
 | 클라우드 (AWS) | AWS Security Bulletins 전체, IAM, EC2, S3, CloudFront, ALB, ECR, ECS·EKS, Lambda, RDS·Aurora, ElastiCache, Cognito, Secrets Manager·KMS | API Gateway, SQS·SNS, AWS SDK for JavaScript |
-| AI·개발 도구 | Claude Code, OpenAI Codex, Cursor, GitHub Copilot, Gemini CLI, VS Code, 확장 마켓플레이스(VS Code Marketplace, Open VSX), MCP 공식 SDK, Vercel AI SDK, LangChain.js, OpenAI·Anthropic SDK | JetBrains IDE, 많이 쓰는 MCP 서버, 악성 MCP 서버·스킬 유포, LlamaIndex.TS |
-| 런타임·프레임워크 | Node.js(undici 포함), TypeScript, React, Next.js, NestJS | Express, Fastify |
-| 데이터베이스 | PostgreSQL, MySQL·MariaDB, MongoDB, Redis(Valkey 포함) | Elasticsearch·OpenSearch, 벡터 DB(pgvector, Qdrant 등), ORM·드라이버(Prisma, TypeORM, pg, mysql2, ioredis, mongoose) |
-| 공급망·CI/CD·인프라 | npm 생태계 공급망, GitHub Actions, GitLab, Docker | Nginx, OpenSSL, OpenSSH, Kubernetes, Git |
+| AI·개발 도구 | Claude Code, OpenAI Codex, Cursor, GitHub Copilot, Gemini CLI, VS Code, 확장 마켓플레이스(VS Code Marketplace, Open VSX), MCP 공식 SDK, Vercel AI SDK, LangChain.js, OpenAI·Anthropic SDK | JetBrains IDE, 많이 쓰는 MCP 서버, 악성 MCP 서버·스킬 유포, LlamaIndex.TS, Python AI 라이브러리(LangChain, LlamaIndex, LiteLLM, vLLM, transformers), MCP Python SDK |
+| 런타임·프레임워크 | Node.js(undici 포함), TypeScript, React, Next.js, NestJS | Express, Fastify, Java(OpenJDK, Oracle Java SE, Amazon Corretto), Spring(Framework, Boot, Security), Apache Tomcat, Log4j, Jackson, Netty, Python(CPython), Django, FastAPI, Flask |
+| 데이터베이스 | PostgreSQL, MySQL·MariaDB, MongoDB, Redis(Valkey 포함) | Elasticsearch·OpenSearch, 벡터 DB(pgvector, Qdrant 등), ORM·드라이버(Prisma, TypeORM, pg, mysql2, ioredis, mongoose), Java·Python 드라이버(pgjdbc, MySQL Connector/J, Hibernate, psycopg, PyMongo, SQLAlchemy) |
+| 공급망·CI/CD·인프라 | npm 생태계 공급망, GitHub Actions, GitLab, Docker | Nginx, OpenSSL, OpenSSH, Kubernetes, Git, Maven Central·PyPI 공급망 |
 
-언어는 Node.js·TypeScript만 본다. AI 서비스 자체의 데이터 유출이나 모델 공급망 사건은 우리 코드·개발 환경에 직접 닿는 경우(예: 쓰고 있는 SDK의 취약점)가 아니면 다루지 않는다.
+언어는 Node.js·TypeScript가 중심이다. Java·Python은 위 표의 '추가' 대상만 보고, 그 밖의 언어는 아래 '언어와 관계없이 다루는 사건'에 해당할 때만 다뤄. AI 서비스 자체의 데이터 유출이나 모델 공급망 사건은 우리 코드·개발 환경에 직접 닿는 경우(예: 쓰고 있는 SDK의 취약점)가 아니면 다루지 않는다.
+
+Java·Python '추가' 대상은 P1·P2이거나 아래 사건에 해당할 때만 '주요 항목'에 쓴다. P3는 '참고'에 쓰지 말고 조사 기록에 `Java·Python P3: <이름> (<식별번호>)` 한 줄로 모아. Node.js 스택에 맞춘 리포트가 다시 길어지지 않게 하려는 것이다.
+
+### 언어와 관계없이 다루는 사건
+
+아래 중 하나에 해당하면 언어와 점검 대상 표에 관계없이 '주요 항목'으로 다뤄. 우선순위는 '우선순위 기준'대로 정하고, 영향 범위 문단 첫머리에 어떤 환경이 해당하는지 밝혀(예: "Java 서비스를 운영하는 경우만 해당합니다").
+
+- CISA KEV에 새로 오른 것 중 개발자가 쓰는 런타임·프레임워크·패키지·개발 도구(예: OpenJDK, LiteLLM). 네트워크 장비, OS, 업무용 앱은 지금처럼 조사 기록에 한 줄만 적어.
+- 실제 악용이 확인된 원격 코드 실행
+- Hacker News 대조(8번)에 오른 취약점·공격 사건 중 1차 자료로 확인되는 것(예: 2026-11-18 "Java4Shell")
+- 이미 널리 쓰이던 패키지의 탈취나 악성 버전 배포. npm과 PyPI는 주간 다운로드 10만 이상(`https://api.npmjs.org/downloads/point/last-week/<패키지>`, `https://pypistats.org/api/packages/<패키지>/recent`의 `last_week`), Maven은 위 표의 Java 대상 패키지만. 다운로드 수를 조회하지 못하면 점검 대상 표의 패키지만 다뤄.
 
 ### 우선순위 기준
 
@@ -107,6 +119,7 @@ P1·P2 항목과 P3 한 줄을 합쳐 5~15건이 목표야. 해당 소식이 적
 4. **참고**: P3를 한 줄 목록으로 써. `- ⑤ 제품과 버전 — 무엇이 문제이고 누가 해당하는지 1~2문장 · [원문](URL)`. 수정 버전이 있으면 문장에 넣어. 없으면 이 절을 빼.
    - 한 사건이 두 분야에 걸치면 한 번만 쓰고, '한눈에 보기'에는 더 직접적인 분야에 넣어.
    - AWS 공지처럼 서비스 쪽에서 이미 조치되어 독자가 할 일이 없으면 P3로 쓰고 "따로 할 일은 없습니다"처럼 밝혀.
+   - Java·Python '추가' 대상의 P3는 여기 쓰지 않고 조사 기록에 모아('점검 대상').
 5. **아직 조치 기간인 P1**: 최근 7일 안에 다룬 P1 중 아직 조치 기간인 것을 표로 써. `| 식별번호 | 대상 (보고일) | 해야 할 일 |`. 해야 할 일 칸에는 수정 버전을 그대로 적어. 없으면 이 절을 빼.
 6. **오늘 확인할 명령**: 오늘 다룬 항목이 내 환경에 해당하는지 **확인만 하는** 명령을 모아. 설치·수정·삭제하는 명령은 쓰지 마.
    - npm 패키지는 `npm ls --all <패키지…>`로 한데 묶고, 수정 버전을 옆에 적어.
@@ -119,6 +132,7 @@ P1·P2 항목과 P3 한 줄을 합쳐 5~15건이 목표야. 해당 소식이 적
    - 확인 실패: `<대상> (<출처>)`. 조회에 실패했거나 확인하지 못한 대상이야.
    - 새 버전·새 공지가 없던 출처와 지금 버전
    - KEV `catalogVersion`과 점검 대상 밖 신규 등재, "그 밖의 npm 권고 N건"·"그 밖의 NVD 신규 N건" 같은 건수
+   - `Java·Python P3: <이름> (<식별번호>)`와 Maven·PyPI 권고·악성 패키지 건수
    - Hacker News 대조 결과
    - 후속 확인: 새로 올린 항목, 열린 항목과 상태
 
@@ -167,6 +181,7 @@ P1·P2 항목과 P3 한 줄을 합쳐 5~15건이 목표야. 해당 소식이 적
 | 런타임·프레임워크 | Node.js 보안 릴리스, Next.js 보안 블로그, React 블로그, NestJS 릴리스 |
 | 데이터베이스 | PostgreSQL 보안 정보, Oracle Critical Patch Update(MySQL, 1·4·7·10월), MariaDB 보안(분기 패치 사이의 CVE는 NVD 스캔으로), MongoDB 보안 경고, Redis·Valkey GitHub 보안 권고, Elastic 보안 공지 |
 | 공급망·CI/CD·인프라 | GitHub 블로그·Changelog, GitLab 보안 릴리스, Docker 보안 공지, nginx 보안 권고, OpenSSL 취약점 목록, OpenSSH 릴리스 노트, Git 보안 권고(`git/git` GitHub 보안 권고) |
+| Java·Python | Oracle Critical Patch Update(Java SE, 1·4·7·10월), OpenJDK 보안 권고, Spring 보안 권고, Apache Tomcat 보안 페이지, Log4j 보안 페이지, Python 보안 공지(PSF), Django 보안 릴리스, Maven·PyPI의 GitHub 보안 권고(2번 OSV 목록) |
 | 보조 | 보안 업체 분석(Socket, Snyk, StepSecurity, Wiz 등). 공급망 사건을 빨리 알려 주지만 1차 자료로 확인되지 않으면 "미확인 보도"로 분리해. Hacker News(8번)는 놓친 사건을 찾는 데만 쓰고 출처로 쓰지 않는다. |
 
 확인되지 않은 CVE, 버전, 악용 사례를 만들어내지 마.
