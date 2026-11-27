@@ -143,4 +143,5 @@ Maven·PyPI 목록도 npm과 같은 형식(`<수정 시각>,<ID>`, 최근 수정
   - 새로 넣은 이름으로 들어온 것은 django 11, tomcat 11, java se 10, pgjdbc 8, vllm 7, litellm 7, netty 6, spring 2, flask 2로 13일 동안 64건(하루 5건 안팎)이다.
 - [x] OSV Maven·PyPI 목록과 상세 조회: `curl`로 목록 두 개를 받아 최근 1일·7일 건수를 셌고, `api.osv.dev`에서 Maven 권고(GHSA-563x-q5rq-57qp, `org.apache.tomcat:tomcat-coyote`)를 열었다.
 - [ ] 루틴 환경의 pypistats 조회 가능 여부(Q3). 이 컴퓨터에서는 `requests`의 `last_week`가 나온다.
+- [x] 시험 실행(2026-11-27 19시): OSV 목록 4개(npm, GitHub Actions, Maven, PyPI)를 모두 조회했고, vLLM P3 3건이 본문 대신 조사 기록에 `Java·Python P3`로 모였다. 'Java·Python 추가 대상'에 AI 행의 Python 라이브러리가 드는지 모호하다는 지적이 있어, 대상을 '추가 칸에 적은 Java·Python 이름과 Maven·PyPI 공급망'으로 적었다. MongoDB 보안 경고 주소도 벤더 공지 표에 넣었다.
 - [ ] 첫 아침 실행: Java·Python 항목이 R1·R3대로 들어가고, 보고서가 분량 검사를 통과한다.

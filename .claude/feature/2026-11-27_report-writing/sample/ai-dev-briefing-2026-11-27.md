@@ -5,8 +5,8 @@ date: 2026-11-27
 generated_at: 2026-11-27T08:50:00+09:00
 level: urgent
 summary: "NestJS 12.6.3은 패치 버전이지만 라우트 충돌 판정과 @Body('key') 동작이 바뀌었습니다. 올리기 전에 부팅·e2e 테스트를 돌려야 합니다."
-headline: "NestJS 12.6.3 라우트 충돌 판정 변경, openai 7.65.0, Qwen Code 0.28.7"
-description: "라우트 충돌 판정과 @Body('key'), 버전별 미들웨어 제외 동작을 바꾼 NestJS 12.6.3, 지출 알림과 세션 vault 갱신을 넣은 openai 7.65.0, 반복 감지를 없앤 Qwen Code 0.28.7을 정리했습니다. 주목할 스킬로 Postgres 규칙 모음 supabase-postgres-best-practices를 골랐습니다."
+headline: "NestJS 12.6.3 라우트 충돌 판정 변경, Qwen Code 0.28.7"
+description: "라우트 충돌 판정을 바꾼 NestJS 12.6.3, 세션 vault 갱신을 넣은 openai 7.65.0, 반복 감지를 없앤 Qwen Code 0.28.7을 정리하고 Postgres 규칙 스킬을 골랐습니다."
 tags: ["NestJS", "Fastify", "OpenAI Node SDK", "Qwen Code", "Vercel AI SDK", "PostgreSQL", "Agent Skills"]
 ---
 [2026-11-27 AI·개발 도구 브리핑]

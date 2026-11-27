@@ -5,7 +5,7 @@ date: 2026-11-26
 generated_at: 2026-11-26T08:40:00+09:00
 level: notice
 summary: "새 P1은 없습니다. AWS Config 자동 조치로 Session Manager 감사 로그 런북을 써 왔다면 이번 주 안에 리비전을 바꾸고 설정 문서를 점검해야 합니다."
-headline: "AWS Config 런북 CVE-2026-134070, MongoDB 드라이버 CVE, tsc 사칭 악성 패키지"
+headline: "AWS Config 런북 명령 주입, MongoDB 드라이버 CVE"
 description: "AWS Config 자동 조치 런북의 Session Manager 설정 주입, 새벽 긴급 감시로 알린 MongoDB 드라이버 CVE, GitLab 보안 패치 13건, TypeScript tsc를 가로채 GitHub Actions 비밀을 빼 가는 npm 악성 패키지를 정리했습니다."
 tags: ["AWS", "CVE-2026-134070", "Kiro", "GitLab", "MongoDB", "TypeScript", "GitHub Actions", "npm"]
 metrics: {p1: 0, p2: 2, p3: 7, malicious_npm: 32, kev_added: 10}

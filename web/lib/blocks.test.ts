@@ -133,6 +133,17 @@ describe("Markdown 그림 블록과 배지", () => {
     expect(html).not.toContain("<svg");
   });
 
+  it("값이 없는 지표는 타일을 빼고, 모두 비었으면 안내 한 줄만 보여 준다", () => {
+    const window = trendWindow("2026-11-27");
+    const series = { usdkrw: [{ date: "2026-11-27", value: 1337.9 }] };
+    const some = render("```trend\nsp500, usdkrw\n```\n", { task: "sp500-morning-check", window, series });
+    expect(some).toContain("원/달러");
+    expect(some).not.toContain(">S&amp;P500<");
+    const none = render("```trend\nsp500, vix\n```\n", { task: "sp500-morning-check", window, series: {} });
+    expect(none).toContain("추이 차트는 값이 쌓이면 보입니다.");
+    expect(none).not.toContain("<pre>");
+  });
+
   it("표 칸과 소제목의 P1·P2·P3를 배지로 바꾼다", () => {
     const html = render("### ① [P2] AWS Config 런북\n\n| 분야 | 상태 |\n|---|---|\n| AWS | P1 |\n| DB | 이상 없음 |\n");
     expect(html).toMatch(/<h3 id="[^"]+">① <span[^>]*>P2<\/span> AWS Config 런북<\/h3>/);
